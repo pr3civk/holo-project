@@ -14,12 +14,12 @@ void main()
     }
     // wyciągnięcie wartości y z uv
     float stripes = mod((vPosition.y- uTime * 0.2) * uFrequency, 1.0);
-    stripes = pow(stripes, 3.0);
+    stripes = pow(stripes, 2.0);
 
     // Fresnel
     vec3 viewDirection = vPosition - cameraPosition;
     float fresnel = dot(normalize(viewDirection), normal) + 1.0;
-    fresnel = pow(fresnel, 2.0);
+    fresnel = fresnel * 0.9;
 
     // Falloff
     float falloff = smoothstep(uFalloff, 0.0, fresnel);

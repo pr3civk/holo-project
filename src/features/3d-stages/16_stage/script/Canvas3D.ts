@@ -67,8 +67,8 @@ class Canvas3D {
 
 		// Renderer
 		this.rendererParameters = {
-			frequency: 14,
-			falloff: 0.9,
+			frequency: 20,
+			falloff: 0.8,
 			color: new THREE.Color("#004cff"),
 			hoverGlitchIntensity: 0.0,
 		};
