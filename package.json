@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"hologram-3d-projekt": "file:",
+		"lenis": "^1.2.3",
 		"lil-gui": "^0.20.0",
 		"three": "^0.175.0"
 	}
