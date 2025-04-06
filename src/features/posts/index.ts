@@ -19,7 +19,7 @@ export const posts: Post[] = [
 	},
 	{
 		id: "3",
-		title: "Matematyka w shaderach",
+		title: "Tworzenie shadera 'żaluzji' do wykorzystania w animacji hologramu",
 		content: `
       <p>Opis postu</p>  
     `,
