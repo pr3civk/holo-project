@@ -35,12 +35,11 @@ body {
   font-size: 1.2em;
 }
 
-code {
-  width: 100%; 
-  display: block;
-  background-color: #1d1d1d;
-  padding: 4px;
-  border-radius: 4px;
+.code {
+  background-color: #1d1f2a;
+  padding: 10px;
+  border-radius: 5px;
+  color: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {

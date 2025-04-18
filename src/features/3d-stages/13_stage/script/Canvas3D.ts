@@ -6,7 +6,7 @@ import vertexShader from "../shaders/vertex.glsl";
 import fragmentShader from "../shaders/fragment.glsl";
 
 type RendererParameters = {
-	clearColor: string;
+	bgColor: string;
 	frequency: number;
 	falloff: number;
 	color: THREE.Color;
@@ -65,7 +65,7 @@ class Canvas3D {
 
 		// Renderer
 		this.rendererParameters = {
-			clearColor: "#1d1f2a",
+			bgColor: "#1d1f2a",
 			frequency: 20,
 			falloff: 0.8,
 			color: new THREE.Color("#00ff00"),
@@ -75,7 +75,7 @@ class Canvas3D {
 			canvas: this.canvas,
 			antialias: true,
 		});
-		this.renderer.setClearColor(this.rendererParameters.clearColor);
+		this.renderer.setClearColor(this.rendererParameters.bgColor);
 		this.renderer.setSize(this.sizes.width, this.sizes.height);
 		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -107,8 +107,8 @@ class Canvas3D {
 	}
 
 	private setupGUI(): void {
-		this.gui.addColor(this.rendererParameters, "clearColor").onChange(() => {
-			this.renderer.setClearColor(this.rendererParameters.clearColor);
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
 		});
 		this.gui
 			.add(this.rendererParameters, "frequency")

@@ -9,7 +9,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 // Definicja typu dla parametrów renderera
 type RendererParameters = {
-	clearColor: string; // Kolor tła sceny
+	bgColor: string; // Kolor tła sceny
 	frequency: number; // Częstotliwość odświeżania
 };
 class Canvas3D {
@@ -67,7 +67,7 @@ class Canvas3D {
 
 		// Ustawienie parametrów renderera
 		this.rendererParameters = {
-			clearColor: "#1d1f2a", // Kolor tła
+			bgColor: "#1d1f2a", // Kolor tła
 			frequency: 10, // Częstotliwość odświeżania
 		};
 
@@ -76,7 +76,7 @@ class Canvas3D {
 			canvas: this.canvas,
 			antialias: true, // Włączenie antyaliasingu
 		});
-		this.renderer.setClearColor(this.rendererParameters.clearColor); // Ustawienie koloru tła
+		this.renderer.setClearColor(this.rendererParameters.bgColor); // Ustawienie koloru tła
 		this.renderer.setSize(this.sizes.width, this.sizes.height); // Ustawienie rozmiaru renderera
 		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Ograniczenie pixel ratio dla wydajności
 
@@ -109,8 +109,8 @@ class Canvas3D {
 
 	private setupGUI(): void {
 		// Dodanie kontrolki koloru tła do panelu debugowania
-		this.gui.addColor(this.rendererParameters, "clearColor").onChange(() => {
-			this.renderer.setClearColor(this.rendererParameters.clearColor);
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
 		});
 		// Dodanie kontrolki częstotliwości do panelu debugowania
 		this.gui.add(this.rendererParameters, "frequency").onChange(() => {

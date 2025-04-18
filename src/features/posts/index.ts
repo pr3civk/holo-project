@@ -6,11 +6,6 @@ export const posts: Post[] = [
 	{
 		id: "0",
 		title: "Inicjalizacja projektu",
-		githubCode: {
-			html: "https://github.com/pr3civk/holo-project/blob/main/src/features/3d-stages/0_stage/index.html",
-			ts: "https://github.com/pr3civk/holo-project/blob/main/src/features/3d-stages/0_stage/script/Canvas3D.ts",
-			css: "https://github.com/pr3civk/holo-project/blob/main/src/features/3d-stages/0_stage/styles/index.css",
-		},
 		content: `
   <section class="post-content">
 		<h3>Opis:</h3>
@@ -31,6 +26,29 @@ export const posts: Post[] = [
       występujących w środowisku — zarówno geometrycznych, jak i oświetleniowych czy kamer.
     </p>
 
+    <label>index.html</label>
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff;">
+      <code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Hologram - poradnik&lt;/title&gt;
+  &lt;link rel="stylesheet" href="./styles/index.css"&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;canvas class="webgl"&gt;&lt;/canvas&gt;
+  &lt;script type="module" src="./script/Canvas3D.ts"&gt;&lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+      </code>
+    </pre>
+
     <p>
       Kolejnym krokiem jest skonfigurowanie kamery. Zazwyczaj używa się kamery perspektywicznej, która
       odwzorowuje sposób widzenia znany z rzeczywistości. W kontekście interakcji użytkownika, kluczowe
@@ -46,6 +64,165 @@ export const posts: Post[] = [
       rendererów często obejmuje także antyaliasing, który niweluje efekt „ząbkowania” na krawędziach
       obiektów.
     </p>
+
+    <label>Canvas3D.ts</label>
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+      <code>
+// Importuje bibliotekę Three.js
+import * as THREE from "three";
+// Importuje kontroler OrbitControls z dodatków Three.js
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+// Klasa zarządzająca sceną 3D
+class Canvas3D {
+	// Prywatne pola klasy
+	private canvas: HTMLCanvasElement; // Element canvas HTML
+	private scene: THREE.Scene; // Scena Three.js
+	private sizes: { width: number; height: number }; // Wymiary okna
+	private camera: THREE.PerspectiveCamera; // Kamera perspektywiczna
+	private controls: OrbitControls; // Kontroler kamery
+	private renderer: THREE.WebGLRenderer; // Renderer WebGL
+
+	// Konstruktor przyjmujący selektor elementu canvas
+	constructor(canvasSelector: string) {
+		// Pobiera element canvas z DOM
+		const canvasElement = document.querySelector(canvasSelector);
+		// Sprawdza czy element canvas istnieje
+		if (!canvasElement) {
+    throw new Error(
+      \`Canvas element with selector \${canvasSelector} not found\`
+    );
+    }
+		// Przypisuje element canvas do pola klasy
+		this.canvas = canvasElement as HTMLCanvasElement;
+
+		// Tworzy nową scenę Three.js
+		this.scene = new THREE.Scene();
+
+		// Ustawia wymiary na podstawie rozmiaru okna
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+		};
+
+		// Tworzy kamerę perspektywiczną
+		this.camera = new THREE.PerspectiveCamera(
+			40, // Kąt widzenia (FOV)
+			this.sizes.width / this.sizes.height, // Proporcje
+			0.1, // Bliska płaszczyzna przycinania
+			100 // Daleka płaszczyzna przycinania
+		);
+		// Ustawia pozycję kamery
+		this.camera.position.set(10, 0, 0);
+		// Dodaje kamerę do sceny
+		this.scene.add(this.camera);
+
+		// Tworzy kontroler OrbitControls dla kamery
+		this.controls = new OrbitControls(this.camera, this.canvas);
+		// Włącza efekt tłumienia dla płynniejszego ruchu
+		this.controls.enableDamping = true;
+
+		// Tworzy renderer WebGL
+		this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvas,
+			antialias: true, // Włącza antyaliasing
+		});
+		// Ustawia rozmiar renderera
+		this.renderer.setSize(this.sizes.width, this.sizes.height);
+		// Ustawia gęstość pikseli (dla ekranów HiDPI)
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+		// Konfiguracja początkowa
+		this.setupEventListeners(); // Ustawia nasłuchiwanie zdarzeń
+		this.loadModel(); // Ładuje model 3D
+		this.animate(); // Uruchamia pętlę animacji
+	}
+
+	// Metoda konfigurująca nasłuchiwanie zdarzeń
+	private setupEventListeners(): void {
+		// Nasłuchuje zdarzenia zmiany rozmiaru okna
+		window.addEventListener("resize", () => {
+			// Aktualizuje wymiary
+			this.sizes.width = window.innerWidth;
+			this.sizes.height = window.innerHeight;
+
+			// Aktualizuje proporcje kamery
+			this.camera.aspect = this.sizes.width / this.sizes.height;
+			// Aktualizuje macierz projekcji kamery
+			this.camera.updateProjectionMatrix();
+
+			// Aktualizuje rozmiar renderera
+			this.renderer.setSize(this.sizes.width, this.sizes.height);
+			// Aktualizuje gęstość pikseli
+			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		});
+	}
+
+	// Metoda ładująca model 3D
+	private loadModel(): void {
+		// Tworzy geometrię płaszczyzny
+		const plane = new THREE.PlaneGeometry(5, 5);
+		// Tworzy materiał z kolorem białym
+		const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+		// Tworzy siatkę (mesh) z geometrii i materiału
+		const planeMesh = new THREE.Mesh(plane, material);
+
+		// Obraca płaszczyznę o 90 stopni wokół osi Y
+		planeMesh.rotation.y = Math.PI / 2;
+
+		// Dodaje płaszczyznę do sceny
+		this.scene.add(planeMesh);
+	}
+
+	// Metoda obsługująca animację
+	private animate(): void {
+		// Funkcja wykonywana w każdej klatce animacji
+		const tick = () => {
+			// Aktualizuje kontroler kamery
+			this.controls.update();
+
+			// Renderuje scenę
+			this.renderer.render(this.scene, this.camera);
+
+			// Wywołuje funkcję tick ponownie w następnej klatce
+			window.requestAnimationFrame(tick);
+		};
+
+		// Uruchamia pierwszą klatkę animacji
+		tick();
+	}
+}
+
+// Eksportuje instancję klasy Canvas3D z selektorem ".webgl"
+export const canvas3D = new Canvas3D(".webgl");
+      </code>
+    </pre>
+
+<label>index.css</label>
+<pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+<code>
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+</code>
+</pre>
 
     <p>
       W przykładowej scenie dodawany jest również prosty obiekt geometryczny — płaszczyzna o białym kolorze
@@ -74,10 +251,6 @@ export const posts: Post[] = [
 	{
 		id: "1",
 		title: "O shaderach",
-		githubCode: {
-			ts: "https://github.com/pr3civk/holo-project/blob/main/src/features/3d-stages/1_stage/script/Canvas3D.ts",
-			glsl: "https://github.com/pr3civk/holo-project/blob/main/src/features/3d-stages/1_stage/shaders/fragment.glsl",
-		},
 		content: `
       <section>
 			<h3>Opis:</h3>
@@ -88,66 +261,121 @@ export const posts: Post[] = [
           graficznych. Przykładowy system inicjalizacji sceny 3D został wzbogacony o wsparcie dla shaderów GLSL oraz
           interfejsu GUI na bazie biblioteki lil-gui.
         </p>
-    
+
         <p>
-          Inicjalizacja rozpoczyna się od określenia selektora elementu <code>&lt;canvas&gt;</code>, który będzie stanowił
-          powierzchnię renderującą. Wykorzystywana jest tutaj struktura klasowa, co pozwala na modularne zarządzanie
-          komponentami systemu. Tworzona scena 3D zawiera standardowe elementy jak kamera perspektywiczna oraz kontrolery
-          użytkownika typu OrbitControls, pozwalające na intuicyjne obracanie oraz przybliżanie widoku.
-        </p>
-    
-        <p>
-          Nowością w przedstawionej architekturze jest zastosowanie dedykowanego GUI, umożliwiającego dynamiczną zmianę
+          Nowością w przedstawionej architekturze jest zastosowanie dedykowanego GUI, umożliwiającego, jako przykład, dynamiczną zmianę
           koloru tła renderera. Parametr koloru jest definiowany jako część konfiguracyjnego obiektu i aktualizowany na
           bieżąco w reakcji na działania użytkownika. Takie podejście zwiększa interaktywność aplikacji i wspiera szybkie
           prototypowanie.
         </p>
-    
+
+        <label>Canvas3D.ts</label>
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+          <code>
+<span style="color: #ff0000;">import GUI from "lil-gui";</span>          
+</span>          
+//Dodane pole dla gui
+<span style="color: #ff0000;">private gui: GUI;</span>
+private canvas: HTMLCanvasElement;
+private scene: THREE.Scene;
+private sizes: { width: number; height: number };
+//...
+
+//Dodane pole dla gui
+<span style="color: #ff0000;">import GUI from "lil-gui";         
+private setupGUI(): void {
+  this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+		this.renderer.setClearColor(this.rendererParameters.bgColor);
+  });
+}
+</span> 
+          </code>
+        </pre>
+
+
         <p>
           Kolejnym kluczowym komponentem systemu jest użycie materiału opartego na shaderach. W miejsce gotowych materiałów
           Three.js zastosowano ShaderMaterial z własnymi programami wierzchołkowymi i fragmentowymi. Dzięki temu możliwe
           jest pełne przejęcie kontroli nad procesem renderowania, co otwiera drogę do implementacji efektów specjalnych,
           takich jak niestandardowe oświetlenie, animacje proceduralne czy efekty post-processingu.
-        </p>
+
+        <label>fragment.glsl</label>
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+          <code>
+void main()
+{
+    // Kolor finalny
+    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+          </code>
+        </pre>
+
+        <label>vertex.glsl</label>
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+          <code>
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+}
+          </code>
+        </pre>
+
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+          <code>
+// Importuje shader wierzchołkowy
+import vertexShader from "../shaders/vertex.glsl";
+// Importuje shader fragmentów
+import fragmentShader from "../shaders/fragment.glsl";
+
+// Tworzy materiał oparty na shaderach
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+});
+        </code>
+      </pre>
     
         <p>
-          W omawianej konfiguracji <code>ShaderMaterial</code> bazuje na dwóch komponentach – shaderze wierzchołkowym
+          W konfiguracji <code>ShaderMaterial</code> bazuje na dwóch komponentach – shaderze wierzchołkowym
           (<code>vertex shader</code>) oraz shaderze fragmentów (<code>fragment shader</code>). Shader wierzchołkowy
           odpowiada za przekształcenie współrzędnych obiektu w przestrzeni modelu do przestrzeni widoku oraz projekcji, a
           także przekazuje współrzędne UV do dalszego etapu renderowania. Kluczową rolę pełni tu zmienna <code>vUv</code>,
           która przechowuje wartości współrzędnych UV każdego wierzchołka i przekazywana jest do shaderu fragmentów.
         </p>
     
-        <p>
-          Shader fragmentów dokonuje obliczeń koloru końcowego piksela. W tym przypadku jego działanie opiera się na prostym
-          przekształceniu – odczytywana jest wartość <code>x</code> ze współrzędnych UV (czyli poziome położenie piksela na
-          powierzchni geometrycznej), a następnie używana jako wartość jasności koloru RGB. Efektem tego działania jest
-          gradient poziomy: od czerni (po lewej stronie płaszczyzny) do bieli (po prawej). Całość renderowana jest z
-          zachowaniem tonemappingu i przestrzeni kolorów, co pozwala uzyskać efekt spójny z domyślnymi ustawieniami silnika
-          Three.js.
-        </p>
-    
+
         <p>
           Renderowana scena zawiera prosty obiekt geometryczny – płaszczyznę – który jest obracany w przestrzeni 3D i
           pokrywany materiałem zdefiniowanym przez shadery. Całość objęta jest pętlą animacyjną, w której aktualizowane są
           kontrolery i odświeżany jest rendering. Obsługa zdarzeń zmiany rozmiaru okna zapewnia responsywność i zachowanie
           prawidłowych proporcji niezależnie od urządzenia.
         </p>
-    
-        <p>
-          Połączenie GUI z shaderami i systemem renderowania w Three.js prezentuje nowoczesne podejście do budowy
-          interaktywnych wizualizacji 3D w środowisku przeglądarkowym. Dzięki wysokiej elastyczności i modularnej strukturze
-          kodu możliwa jest dalsza rozbudowa aplikacji o kolejne elementy i efekty wizualne.
-        </p>
       </section>
     `,
 	},
 	{
 		id: "2",
-		title: "Tworzenie shadera 'żaluzji' do wykorzystania w animacji hologramu",
+		title: "Tworzenie gradientu z użyciem shaderów",
 		content: `
 	<section>
 		<h3>Opis:</h3>
+    <p>
+      Shader fragmentów dokonuje obliczeń koloru końcowego piksela. W tym przypadku jego działanie opiera się na prostym
+      przekształceniu – odczytywana jest wartość <code>x</code> ze współrzędnych UV (czyli poziome położenie piksela na
+      powierzchni geometrycznej), a następnie używana jako wartość jasności koloru RGB. Efektem tego działania jest
+      gradient poziomy: od czerni (po lewej stronie płaszczyzny) do bieli (po prawej). Całość renderowana jest z
+      zachowaniem tonemappingu i przestrzeni kolorów, co pozwala uzyskać efekt spójny z domyślnymi ustawieniami silnika
+      Three.js.
+    </p>
+    
 		<p>
 			W procesie tworzenia aplikacji 3D często pojawia się potrzeba wzbogacenia statycznych scen o interaktywne,
 			dynamiczne komponenty. Three.js umożliwia to między innymi poprzez wykorzystanie materiałów opartych na shaderach
@@ -163,79 +391,51 @@ export const posts: Post[] = [
 			interakcji i możliwości dynamicznej kontroli nad wyglądem sceny.
 		</p>
 
-		<p>
-			Druga wersja wprowadza istotne rozszerzenia. Po pierwsze, dodany został uniform <code>uFrequency</code>, który
-			wpływa na sposób obliczania koloru we fragmencie shadera. Tym razem operacja opiera się na współrzędnej
-			<code>vUv.y</code> (czyli pionowym położeniu piksela) oraz funkcji <code>mod()</code>, która tworzy powtarzający się
-			wzór na bazie podanej częstotliwości. Dzięki temu możliwe jest generowanie efektu pasów lub fali, których
-				intensywność i gęstość można regulować w czasie rzeczywistym.
-			</p>
+    <label>fragment.glsl</label>
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+      <code>
+varying vec2 vUv;
 
-			<p>
-				Kluczowym uzupełnieniem systemu jest integracja GUI, pozwalającego użytkownikowi zmieniać wartość uniformu
-				<code>uFrequency</code> bez konieczności ingerencji w kod. Parametr ten zdefiniowany jest w strukturze
-				<code>rendererParameters</code>, a jego zmiany są natychmiast przekazywane do materiału za pomocą odniesienia do
-				<code>this.material.uniforms</code>. To rozwiązanie umożliwia pełną kontrolę nad wyglądem shaderów w czasie
-				rzeczywistym i stanowi fundament dla dalszych eksperymentów z generatywną grafiką 3D.
-			</p>
+void main()
+{
+    // wyciągnięcie wartości x z uv
+    float x = vUv.x;
 
-			<p>
-				Dodatkowo, architektura została uporządkowana poprzez wyodrębnienie metody <code>createMaterial()</code>, która
-				odpowiada wyłącznie za konfigurację materiału shaderowego. Taki podział obowiązków wspiera czytelność kodu oraz jego
-				przyszłą rozbudowę, np. o więcej uniformów, efekty animacji, przejścia między shaderami czy dynamiczne tekstury.
-			</p>
-
-			<p>
-				Dzięki tym usprawnieniom aplikacja staje się nie tylko bardziej elastyczna, ale i znacznie ciekawsza z punktu
-				widzenia użytkownika końcowego. Możliwość modyfikacji parametrów shaderów w czasie rzeczywistym sprawia, że scena 3D
-				nabiera życia i może być łatwo dostosowywana do różnych potrzeb projektowych lub estetycznych.
-			</p>
-
-			<p>
-				Przedstawiona ewolucja systemu ShaderMaterial doskonale ilustruje potencjał drzemiący w połączeniu Three.js, GLSL i
-				interfejsów GUI. To rozwiązanie idealne dla twórców chcących przekraczać granice statycznych wizualizacji i wprowadzać
-				do swoich projektów elementy interaktywności, generatywności i eksperymentu wizualnego.
-			</p>
+    // Kolor finalny
+    vec4 color = vec4(vec3(x), 1.0);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+      </code>
+    </pre>
 		</section>  
     `,
 	},
 	{
 		id: "3",
-		title: "różnica między uv a pozycjami obiektu",
+		title: "Tworzenie efektu 'żaluzji' z użyciem shaderów",
 		content: `
       <section>
 			<h3>Opis:</h3>
   <p>
-    W rozwoju aplikacji 3D z wykorzystaniem Three.js kluczową rolę odgrywają shadery, które umożliwiają precyzyjne
-    sterowanie wyglądem obiektów na ekranie. Jednym z bardziej zaawansowanych zastosowań shaderów jest wykorzystanie
-    informacji o pozycji w przestrzeni świata w obliczeniach koloru fragmentów. Dzięki temu możliwe jest tworzenie
-    efektów takich jak gradienty, animacje proceduralne czy niestandardowe efekty oświetleniowe. W tym artykule omówimy
-    jak wykorzystać pozycję światową obiektów 3D w shaderach fragmentów w Three.js.
-  </p>
-
-  <p>
-    W tym przykładzie cała scena opiera się na wczytanym obiekcie, który jest renderowany za pomocą materiału
-    zdefiniowanego przez shadery. Do przekształcenia pozycji obiektów w przestrzeni modelu na ostateczną pozycję w
-    przestrzeni kamery oraz projekcji wykorzystywane są standardowe operacje w shaderach wierzchołkowych. Co ważne,
-    wykorzystujemy <code>varying</code>, które pozwala na przesyłanie informacji z shaderów wierzchołkowych do
-    fragmentów.
-  </p>
-
-  <p>
+    Zamieniając <code>uv</code> na <code>vPosition</code> w shaderze wierzchołkowym, mamy większą kontrolę nad obiektem.
     Shader wierzchołkowy przekształca pozycję wierzchołków z przestrzeni modelu na przestrzeń kamery oraz zapewnia
     przesyłanie tych informacji do kolejnego etapu renderowania. W tym przypadku tworzymy zmienną
     <code>vPosition</code>, która przechowuje pozycję wierzchołka w przestrzeni modelu. Następnie, w shaderze
     fragmentów, operujemy na tych danych, aby uzyskać finalny kolor fragmentu. Jest to możliwe dzięki wprowadzeniu
-    zmiennej <code>vPosition</code> do shaderów fragmentów.
+    zmiennej <code>vPosition</code> do shaderów fragmentów, która jest interpolowana między wierzchołkami.
   </p>
 
   <p>
-    Poniżej przedstawiamy kod shaderów wierzchołkowego i fragmentowego, które ilustrują sposób wykorzystania pozycji w
-    przestrzeni modelu w obliczeniach renderujących.
+    Poniżej znajduje się kod shaderów wierzchołkowego i fragmentowego, które tworzą efekt 'żaluzji'.
   </p>
 
-  <pre><code class="language-glsl">
-    // Vertex Shader
+  <label>vertex.glsl</label>
+  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+  <code>
     varying vec3 vPosition;
 
     void main() {
@@ -250,43 +450,35 @@ export const posts: Post[] = [
     }
   </code></pre>
 
-  <pre><code class="language-glsl">
-    // Fragment Shader
-    uniform float uFrequency;
-    varying vec3 vPosition;
+  <label>fragment.glsl</label>
+  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+    <code>
+uniform float uFrequency;
+varying vec2 vUv;
 
-    void main() {
-        // Wyciąganie wartości 'y' z pozycji w przestrzeni modelu
-        float y = vPosition.y;
-        float strength = mod(y * uFrequency, 1.0);
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vUv.y;
+    float strength = mod(y * uFrequency, 1.0);
 
-        // Kolor finalny
-        vec4 color = vec4(vec3(strength), 1.0);
-        gl_FragColor = color;
-        
-        // Tonemapping z Three.js
-        #include <tonemapping_fragment>
-          // Przestrzeń kolorów z Three.js
-          #include <colorspace_fragment>
-            }
-            </code></pre>
-        
-            <p>
-              W powyższym kodzie, shader wierzchołkowy oblicza pozycję wierzchołka w przestrzeni modelu, a następnie przesyła ją
-              do shaderu fragmentów za pomocą zmiennej <code>vPosition</code>. Fragment shader wykorzystuje te dane, aby
-              przekształcić pozycję w pionie (<code>vPosition.y</code>) w wartość jasności, co skutkuje stworzeniem gradientu w
-              kolorze. Wartość częstotliwości <code>uFrequency</code> wpływa na częstotliwość tego gradientu.
-            </p>
+    // Kolor finalny
+    vec4 color = vec4(vec3(strength), 1.0);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+              </code>
+            </pre>
         
             <p>
-              W efekcie, finalna scena wyświetla płaszczyznę, której kolor jest uzależniony od jej wysokości w przestrzeni
-              modelu, co daje efekt płynnej zmiany koloru na powierzchni obiektu w zależności od jego położenia w przestrzeni.
+              Dodano również kontrolę częstotliwości <code>uFrequency</code>, która pozwala na dynamiczną zmianę efektu. 
+              Wartość ta jest przesyłana do shaderów fragmentów, co pozwala na zmianę koloru w zależności od położenia piksela.
             </p>
         
-            <p>
-              Integracja tych elementów z GUI umożliwia dynamiczną zmianę parametrów renderowania, takich jak częstotliwość
-              zmiany koloru, co pozwala na interaktywną manipulację wizualizacją w czasie rzeczywistym.
-            </p>
+            
         
             </section>
     `,
@@ -319,7 +511,7 @@ export const posts: Post[] = [
   </p>
 
   <p>
-    Warto zauważyć, że po załadowaniu modelu, każdemu jego elementowi przypisujemy materiał. W tym przypadku jest to
+    Warto zauważyć, że po załadowaniu modelu, każdemu jego elementowi domyślnie przypisuje się materiał. W tym przypadku jest to
     prosty materiał <code>MeshBasicMaterial</code>, który może zostać wymieniony na bardziej zaawansowany materiał
     oparty na shaderach w późniejszych etapach, co otwiera drogę do implementacji efektów takich jak hologramy,
     niestandardowe oświetlenie czy animacje proceduralne.
@@ -335,8 +527,8 @@ export const posts: Post[] = [
     Poniżej przedstawiamy kod, który ładuje model, centrowań go w przestrzeni oraz dostosowuje kamerę do jego rozmiaru:
   </p>
 
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff;"><code class="language-typescript">
-    // Importowanie biblioteki Three.js
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code class="language-typescript">
+// Importowanie biblioteki Three.js
 import * as THREE from "three";
 // Importowanie kontrolera kamery umożliwiającego obracanie sceny
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -347,7 +539,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 // Definicja typu dla parametrów renderera
 type RendererParameters = {
-	clearColor: string; // Kolor tła sceny
+	bgColor: string; // Kolor tła sceny
 	frequency: number; // Częstotliwość odświeżania
 };
 class Canvas3D {
@@ -360,7 +552,6 @@ class Canvas3D {
 	private controls: OrbitControls; // Kontroler do obracania kamery
 	private rendererParameters: RendererParameters; // Parametry renderera
 	private renderer: THREE.WebGLRenderer; // Renderer WebGL
-	private material: THREE.MeshBasicMaterial; // Podstawowy materiał dla modelu
 	private model: THREE.Group | null = null; // Wczytany model 3D
 
 	constructor(canvasSelector: string) {
@@ -370,11 +561,11 @@ class Canvas3D {
 		// Pobieranie elementu canvas z DOM
 		const canvasElement = document.querySelector(canvasSelector);
 		if (!canvasElement) {
-			// Wyrzucenie błędu jeśli element canvas nie został znaleziony
-			throw new Error(
-				"Canvas element with selector " + canvasSelector + " not found"
-			);
-		}
+    // Wyrzucenie błędu jeśli element canvas nie został znaleziony
+    throw new Error(
+      \`Canvas element with selector \${canvasSelector} not found\`
+    );
+    }
 		this.canvas = canvasElement as HTMLCanvasElement;
 
 		// Tworzenie sceny 3D
@@ -405,7 +596,7 @@ class Canvas3D {
 
 		// Ustawienie parametrów renderera
 		this.rendererParameters = {
-			clearColor: "#1d1f2a", // Kolor tła
+			bgColor: "#1d1f2a", // Kolor tła
 			frequency: 10, // Częstotliwość odświeżania
 		};
 
@@ -414,12 +605,11 @@ class Canvas3D {
 			canvas: this.canvas,
 			antialias: true, // Włączenie antyaliasingu
 		});
-		this.renderer.setClearColor(this.rendererParameters.clearColor); // Ustawienie koloru tła
+		this.renderer.setClearColor(this.rendererParameters.bgColor); // Ustawienie koloru tła
 		this.renderer.setSize(this.sizes.width, this.sizes.height); // Ustawienie rozmiaru renderera
 		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Ograniczenie pixel ratio dla wydajności
 
 		// Tworzenie podstawowego materiału
-		this.material = new THREE.MeshBasicMaterial();
 
 		// Konfiguracja i uruchomienie aplikacji
 		this.setupEventListeners(); // Ustawienie nasłuchiwania zdarzeń
@@ -447,8 +637,8 @@ class Canvas3D {
 
 	private setupGUI(): void {
 		// Dodanie kontrolki koloru tła do panelu debugowania
-		this.gui.addColor(this.rendererParameters, "clearColor").onChange(() => {
-			this.renderer.setClearColor(this.rendererParameters.clearColor);
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
 		});
 		// Dodanie kontrolki częstotliwości do panelu debugowania
 		this.gui.add(this.rendererParameters, "frequency").onChange(() => {
@@ -461,10 +651,6 @@ class Canvas3D {
 		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
 			this.model = gltf.scene; // Przypisanie wczytanej sceny do zmiennej model
 			// Przejście przez wszystkie elementy modelu
-			this.model.traverse((child) => {
-				// Zastąpienie materiałów wszystkich siatek naszym materiałem
-				if (child instanceof THREE.Mesh) child.material = this.material;
-			});
 
 			// Centrowanie modelu
 			const box = new THREE.Box3().setFromObject(this.model); // Obliczenie pudełka ograniczającego
@@ -509,31 +695,87 @@ class Canvas3D {
 // Eksport instancji klasy Canvas3D z elementem canvas o selektorze ".webgl"
 export const canvas3D = new Canvas3D(".webgl");
     </code></pre>
-    
-    <p>
-      Kod ten ładuje model 3D, centrowań go w przestrzeni, a także dostosowuje ustawienia kamery do rozmiaru modelu.
-      Kolejnym krokiem będzie implementacja efektów takich jak hologram, które wykorzystają ten załadowany model.
-    </p>
-    
-    <p>
-      Dzięki tej inicjalizacji, masz pełną kontrolę nad modelami 3D w aplikacji, co pozwala na tworzenie zaawansowanych
-      wizualizacji, takich jak efekty świetlne, interaktywne animacje czy, jak w tym przypadku, hologramy.
-    </p>
     </section>
     `,
 	},
 	{
 		id: "5",
-		title: "Nalozenie shadera na model 3d",
+		title: "Potwierdzenie, że domyślnie model 3d ma materiał w THREE.js",
 		content: `
         <section>
 				<h3>Opis:</h3>
     <p>
-      W poprzednim etapie stworzyliśmy aplikację renderującą model 3D w Three.js z wykorzystaniem <code>GLTFLoader</code>, <code>OrbitControls</code> i klasycznego materiału <code>MeshBasicMaterial</code>. Model był centrowany w przestrzeni 3D i renderowany przy pomocy kamery z dynamicznymi kontrolkami. Ten etap był niezbędny, aby przygotować grunt pod wprowadzenie bardziej zaawansowanych efektów wizualnych.
+     Potwierdznie, że domyślnie model 3d ma materiał.
+    </p>
+
+    <label>Canvas3D.ts</label>
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;">
+    <code>
+// dodanie podstawowego materiału
+private material: THREE.MeshBasicMaterial; // Podstawowy materiał dla modelu
+
+//...
+
+// Tworzenie podstawowego materiału
+this.material = new THREE.MeshBasicMaterial();
+
+//..
+
+private loadModel(): void {
+// Wczytanie modelu R2-D2 z pliku GLTF
+	this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+		this.model = gltf.scene; // Przypisanie wczytanej sceny do zmiennej model
+		// Przejście przez wszystkie elementy modelu
+		this.model.traverse((child) => {
+			// Zastąpienie materiałów wszystkich siatek naszym materiałem
+			if (child instanceof THREE.Mesh) child.material = this.material;
+		});
+
+		// Centrowanie modelu
+		const box = new THREE.Box3().setFromObject(this.model); // Obliczenie pudełka ograniczającego
+		const center = box.getCenter(new THREE.Vector3()); // Znalezienie środka modelu
+		// Przesunięcie modelu tak, aby jego środek był w punkcie (0,0,0)
+		this.model.position.x -= center.x;
+		this.model.position.y -= center.y;
+		this.model.position.z -= center.z;
+
+		// Dostosowanie kamery do rozmiaru modelu
+		const size = box.getSize(new THREE.Vector3()).length(); // Obliczenie rozmiaru modelu
+		const distance = size / Math.tan((Math.PI * this.camera.fov) / 180); // Obliczenie optymalnej odległości kamery
+
+		// Ustawienie kamery w odpowiedniej odległości
+		this.camera.position.set(0, 0, distance);
+		this.camera.lookAt(0, 0, 0); // Skierowanie kamery na środek sceny
+		this.controls.update(); // Aktualizacja kontrolera kamery
+
+		// Dodanie modelu do sceny
+		this.scene.add(this.model);
+	});
+}
+    </code>
+    </pre>
+
+    <p>Jak widać, model się nie zmienił.</p>
+
+    </section>
+    `,
+	},
+	{
+		id: "6",
+		title: "Tworzenie efektu 'żaluzji' na modelu 3d",
+		content: `
+    <h3>Opis:</h3>
+    <p>
+      W poprzednim etapie stworzyliśmy aplikację renderującą model 3D w Three.js z wykorzystaniem <code>GLTFLoader</code>, 
+      <code>OrbitControls</code> i klasycznego materiału <code>MeshBasicMaterial</code>. Model był centrowany w przestrzeni 3D 
+      i renderowany przy pomocy kamery z dynamicznymi kontrolkami. 
+      Ten etap był niezbędny, aby przygotować grunt pod wprowadzenie bardziej zaawansowanych efektów wizualnych.
     </p>
 
     <p>
-      Obecnie przeszliśmy do kluczowego momentu projektu – integracji shaderów GLSL (GLSL – OpenGL Shading Language) w celu stworzenia efektu przypominającego hologram. Oto zmiany, które zostały wprowadzone w kodzie źródłowym oraz ich znaczenie:
+      Obecnie przeszliśmy do kluczowego momentu projektu – integracji shaderów GLSL
+      w celu stworzenia efektu przypominającego hologram.
+      Oto zmiany, które zostały wprowadzone w kodzie źródłowym oraz ich znaczenie:
     </p>
 
     <h2>1. Wprowadzenie ShaderMaterial zamiast MeshBasicMaterial</h2>
@@ -541,7 +783,7 @@ export const canvas3D = new Canvas3D(".webgl");
       Dotychczas używany <code>MeshBasicMaterial</code> został zastąpiony niestandardowym materiałem <code>ShaderMaterial</code>, który wykorzystuje dwa pliki shaderów: <code>vertex.glsl</code> oraz <code>fragment.glsl</code>. Dzięki temu zyskujemy pełną kontrolę nad renderowaniem piksela i wierzchołka, co jest podstawą do implementacji efektu holograficznego.
     </p>
 
-    <pre><code class="language-ts">
+      <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 this.material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
@@ -556,7 +798,7 @@ this.material = new THREE.ShaderMaterial({
     </p>
 
     <h2>2. Dodanie vertex shader</h2>
-    <pre><code class="language-glsl">
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 varying vec3 vPosition;
 
 void main() {
@@ -571,7 +813,7 @@ void main() {
     </p>
 
     <h2>3. Dodanie fragment shader</h2>
-    <pre><code class="language-glsl">
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 uniform float uFrequency;
 varying vec3 vPosition;
 
@@ -602,10 +844,11 @@ void main() {
 
     <h2>4. GUI do dynamicznej zmiany efektu</h2>
     <p>
-      Interfejs GUI umożliwia użytkownikowi manipulowanie częstotliwością linii hologramu w czasie rzeczywistym:
+      Interfejs GUI umożliwia użytkownikowi manipulowanie częstotliwością linii hologramu w czasie rzeczywistym, jednakże na razie nie będzie działać ze względu na to, 
+      że nie została dodana zmienna <code>uFrequency</code> do <code>ShaderMaterial</code>.
     </p>
 
-    <pre><code class="language-ts">
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 this.gui.add(this.rendererParameters, "frequency").onChange(() => {
     this.rendererParameters.frequency = this.rendererParameters.frequency;
     if (this.material) {
@@ -613,48 +856,102 @@ this.gui.add(this.rendererParameters, "frequency").onChange(() => {
     }
 });
     </code></pre>
-
-    <p>
-      Dzięki temu użytkownik może eksperymentować z wyglądem efektu bez potrzeby ponownego uruchamiania aplikacji.
-    </p>
     </section>
-    `,
-	},
-	{
-		id: "6",
-		title: "Operacje na shaderach -> co znaczy co",
-		content: `
-      <p>Dodano nowy uniform <code>uTime</code> do <code>ShaderMaterial</code>, który przekazuje do shadera wartość
-  upływającego czasu w sekundach. Dzięki temu możemy tworzyć dynamiczne, zmieniające się w czasie efekty wizualne.</p>
-<p>W klasie <code>Canvas3D</code> dodano instancję <code>THREE.Clock</code>, która pozwala śledzić upływ czasu od
-  momentu uruchomienia aplikacji. Zmienna <code>elapsedTime</code> z tej klasy jest co klatkę przypisywana do uniformu
-  <code>uTime</code>.</p>
-<p>Zmodyfikowano GUI do kontrolowania <code>frequency</code>, dodając zakres od 1 do 50 oraz krok 1. Pozwala to
-  użytkownikowi wygodnie manipulować gęstością efektu pasków w shaderze.</p>
-<p>W <code>fragmentShader</code> zaktualizowano obliczenia, dodając zależność od czasu: <code>(y - uTime * 0.1)</code>.
-  Dzięki temu paski przemieszczają się w górę lub w dół modelu, tworząc dynamiczny efekt skanowania.</p>
-<p>Dodano funkcję <code>pow(stripes, 3.0)</code>, która zaostrza gradient pasków, sprawiając, że są bardziej kontrastowe
-  i lepiej widoczne, co potęguje wrażenie "holograficznego skanu".</p>
+
     `,
 	},
 	{
 		id: "7",
 		title: "Stworzenie animacji polegającej na zmianie czasu",
 		content: `
-     <p>W <code>ShaderMaterial</code> dodano właściwość <code>transparent: true</code>, co pozwala obsługiwać przezroczystość
-  materiału i tym samym wykorzystać kanał alfa w fragmencie koloru.</p>
-<p>W <code>fragmentShader</code> zmieniono linię <code>vec4 color = vec4(vec3(stripes), 1.0);</code> na
-  <code>vec4 color = vec4(vec3(1.0), stripes);</code>. Oznacza to, że teraz efekt pasków wpływa na przezroczystość
-  (kanał alfa), a nie jasność koloru. Dzięki temu powstaje efekt "przemiatania" skanera, gdzie tylko niektóre części
-  modelu są widoczne, zależnie od aktualnego paska.</p>
-<p>Poprzez wykorzystanie kanału alfa shader tworzy dynamiczny efekt pojawiania się i znikania fragmentów modelu, dając
-  bardziej holograficzne, efemeryczne wrażenie.</p>
+ <p>Teraz trzeba dodać nowy uniform <code>uTime</code> do <code>ShaderMaterial</code>, który przekazuje do shadera wartość
+  upływającego czasu w sekundach. Dzięki temu możemy tworzyć dynamiczne, zmieniające się w czasie efekty wizualne.</p>
+
+  <p>W klasie <code>Canvas3D</code> dodano instancję <code>THREE.Clock</code>, która pozwala śledzić upływ czasu od
+    momentu uruchomienia aplikacji. Zmienna <code>elapsedTime</code> z tej klasy jest co klatkę przypisywana do uniformu
+    <code>uTime</code>.</p>
+
+  <label>Canvas3D.ts</label>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+//Dodanie zmiennej clock
+private clock: THREE.Clock;
+//...
+
+//Inicjalizacja zmiennej clock
+this.clock = new THREE.Clock();
+
+//...
+
+//Dodanie animacji na podstawie zmiennej clock
+  private animate(): void {
+    const tick = () => {
+    const elapsedTime = this.clock.getElapsedTime();
+
+    // Update material
+    if (this.material) {
+      this.material.uniforms.uTime.value = elapsedTime;
+    }
+    this.controls.update();
+    // Render
+    this.renderer.render(this.scene, this.camera);
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick);
+  };
+
+tick();
+}
+    </code></pre>
+
+  <label>fragment.glsl</label>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vPosition.y;
+    float stripes = mod((y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(stripes), 1.0);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+    </code></pre>
+  <p>Zmodyfikowano GUI do kontrolowania <code>frequency</code>, dodając zakres od 1 do 50 oraz krok 1. Pozwala to
+    użytkownikowi wygodnie manipulować gęstością efektu pasków w shaderze.</p>
+
+  <p>W <code>fragmentShader</code> zaktualizowano obliczenia, dodając zależność od czasu: <code>(y - uTime * 0.1)</code>.
+    Dzięki temu paski przemieszczają się w górę lub w dół modelu, tworząc dynamiczny efekt skanowania.</p>
+
+  <p>Dodano funkcję <code>pow(stripes, 3.0)</code>, która zaostrza gradient pasków, sprawiając, że są bardziej kontrastowe
+    i lepiej widoczne, co potęguje wrażenie "holograficznego skanu".</p>
+
+
     `,
 	},
 	{
 		id: "8",
-		title: "Tworzenie przezroczystosci i cos o kanale alfa(?)",
+		title: "Tworzenie przezroczystosci",
 		content: `
+
+    <p>W <code>ShaderMaterial</code> dodano właściwość <code>transparent: true</code>, co pozwala obsługiwać przezroczystość
+    materiału i tym samym wykorzystać kanał alfa w fragmencie koloru.</p>
+  <p>W <code>fragmentShader</code> zmieniono linię <code>vec4 color = vec4(vec3(stripes), 1.0);</code> na
+    <code>vec4 color = vec4(vec3(1.0), stripes);</code>. Oznacza to, że teraz efekt pasków wpływa na przezroczystość
+    (kanał alfa), a nie jasność koloru. Dzięki temu powstaje efekt "przemiatania" skanera, gdzie tylko niektóre części
+    modelu są widoczne, zależnie od aktualnego paska.</p>
+  <p>Poprzez wykorzystanie kanału alfa shader tworzy dynamiczny efekt pojawiania się i znikania fragmentów modelu, dając
+    bardziej holograficzne, efemeryczne wrażenie.</p>
+
+
       <p>Dodano nową zmienną <code>vNormal</code> jako <code>varying</code>, która przenosi wektor normalnej z vertex shadera
   do fragment shadera. To umożliwia obliczenia zależne od kąta względem kamery.</p>
 <p>Wprowadzono obliczenie efektu *Fresnela* — iloczyn skalarny znormalizowanej różnicy pozycji kamery i fragmentu z
@@ -666,6 +963,215 @@ this.gui.add(this.rendererParameters, "frequency").onChange(() => {
 <p>Usunięto zastosowanie wartości <code>stripes</code> z wcześniejszego shadera — nie wpływa ona już na kolor ani
   przezroczystość, choć jest nadal liczona. Można ją usunąć, jeśli nie będzie dalej używana lub łączyć z fresnelem dla
   bardziej złożonego efektu.</p>
+
+  <h3>Cały kod do tej pory:</h3>
+  <label>Canvas3D.ts</label>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import GUI from "lil-gui";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import vertexShader from "../shaders/vertex.glsl";
+import fragmentShader from "../shaders/fragment.glsl";
+
+type RendererParameters = {
+	bgColor: string;
+	frequency: number;
+};
+class Canvas3D {
+	private gui: GUI;
+	private canvas: HTMLCanvasElement;
+	private scene: THREE.Scene;
+	private gltfLoader: GLTFLoader;
+	private sizes: { width: number; height: number };
+	private camera: THREE.PerspectiveCamera;
+	private controls: OrbitControls;
+	private rendererParameters: RendererParameters;
+	private renderer: THREE.WebGLRenderer;
+	private material: THREE.ShaderMaterial | undefined;
+	private model: THREE.Group | null = null;
+	private clock: THREE.Clock;
+	constructor(canvasSelector: string) {
+		// Debug
+		this.gui = new GUI();
+
+		// Canvas
+		const canvasElement = document.querySelector(canvasSelector);
+		if (!canvasElement) {
+      throw new Error(
+        \`Canvas element with selector \${canvasSelector} not found\`
+      );
+		}
+		this.canvas = canvasElement as HTMLCanvasElement;
+
+		// Scene
+		this.scene = new THREE.Scene();
+
+		// Loaders
+		this.gltfLoader = new GLTFLoader();
+
+		// Sizes
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+		};
+
+		// Camera
+		this.camera = new THREE.PerspectiveCamera(
+			10,
+			this.sizes.width / this.sizes.height,
+			0.1,
+			100
+		);
+		this.camera.position.set(5, 5, 5);
+		this.scene.add(this.camera);
+
+		// Controls
+		this.controls = new OrbitControls(this.camera, this.canvas);
+		this.controls.enableDamping = true;
+
+		// Renderer
+		this.rendererParameters = {
+			bgColor: "#1d1f2a",
+			frequency: 20,
+		};
+
+		this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvas,
+			antialias: true,
+		});
+		this.renderer.setClearColor(this.rendererParameters.bgColor);
+		this.renderer.setSize(this.sizes.width, this.sizes.height);
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+		// Clock
+		this.clock = new THREE.Clock();
+
+		// Setup
+		this.setupEventListeners();
+		this.setupGUI();
+		this.createMaterial();
+		this.loadModel();
+		this.animate();
+	}
+
+	private setupEventListeners(): void {
+		window.addEventListener("resize", () => {
+			// Update sizes
+			this.sizes.width = window.innerWidth;
+			this.sizes.height = window.innerHeight;
+
+			// Update camera
+			this.camera.aspect = this.sizes.width / this.sizes.height;
+			this.camera.updateProjectionMatrix();
+
+			// Update renderer
+			this.renderer.setSize(this.sizes.width, this.sizes.height);
+			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		});
+	}
+
+	private setupGUI(): void {
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
+		});
+		this.gui
+			.add(this.rendererParameters, "frequency")
+			.min(1)
+			.max(50)
+			.step(1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFrequency.value =
+						this.rendererParameters.frequency;
+				}
+			});
+	}
+
+	private createMaterial(): void {
+		this.material = new THREE.ShaderMaterial({
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
+			transparent: true,
+			uniforms: {
+				uFrequency: { value: this.rendererParameters.frequency },
+				uTime: { value: 0 },
+			},
+		});
+	}
+
+	private loadModel(): void {
+		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+			this.model = gltf.scene;
+			this.model.traverse((child) => {
+				if (child instanceof THREE.Mesh) child.material = this.material;
+			});
+
+			// Centrowanie modelu
+			const box = new THREE.Box3().setFromObject(this.model);
+			const center = box.getCenter(new THREE.Vector3());
+			this.model.position.x -= center.x;
+			this.model.position.y -= center.y;
+			this.model.position.z -= center.z;
+
+			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
+			const size = box.getSize(new THREE.Vector3()).length();
+			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
+
+			this.camera.position.set(0, 0, distance);
+			this.camera.lookAt(0, 0, 0);
+			this.controls.update();
+
+			this.scene.add(this.model);
+		});
+	}
+
+	private animate(): void {
+		const tick = () => {
+			const elapsedTime = this.clock.getElapsedTime();
+
+			// Update material
+			if (this.material) {
+				this.material.uniforms.uTime.value = elapsedTime;
+			}
+			this.controls.update();
+			// Render
+			this.renderer.render(this.scene, this.camera);
+
+			// Call tick again on the next frame
+			window.requestAnimationFrame(tick);
+		};
+
+		tick();
+	}
+}
+
+export const canvas3D = new Canvas3D(".webgl");
+  </code></pre>
+
+  <label>fragment.glsl</label>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vPosition.y;
+    float stripes = mod((y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(1.0), stripes);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+  </code></pre>
+
     `,
 	},
 	{
@@ -674,12 +1180,15 @@ this.gui.add(this.rendererParameters, "frequency").onChange(() => {
 		content: `
 		<p><strong>Efekt Fresnela</strong> to zjawisko optyczne, które opisuje, jak światło odbija się od powierzchni w
   zależności od kąta patrzenia. Zgodnie z tym efektem:</p>
-<p><strong>Im bardziej patrzysz na powierzchnię pod kątem (czyli po krawędzi), tym bardziej ją widać.</strong> A im
-  patrzysz bardziej "na wprost", tym mniej widoczna się staje (częściej przeźroczysta lub mniej błyszcząca).</p>
+  
+<p><strong>Im bardziej się patrzy na powierzchnię pod kątem (czyli po krawędzi), tym bardziej ją widać.</strong> A im
+  się patrzy bardziej "na wprost", tym mniej widoczna się staje (częściej przeźroczysta lub mniej błyszcząca).</p>
 <p><strong>Wzór podstawowy:</strong></p>
+
 <pre><code>vec3 viewDir = normalize(vPosition - cameraPosition);
 float fresnel = dot(viewDir, vNormal);</code></pre>
 <p><strong>Co tu się dzieje:</strong></p>
+
 <ul>
   <li><code>vPosition - cameraPosition</code> – kierunek z fragmentu (punktu na obiekcie) do kamery.</li>
   <li><code>vNormal</code> – normalna powierzchni (czyli "prosto" z niej wychodzący wektor).</li>
@@ -693,6 +1202,34 @@ float fresnel = dot(viewDir, vNormal);</code></pre>
 <p>1 oznacza, że obiekt jest całkowicie błyszczący i odbija światło.</p>
 <p>Wartość 0.5 oznacza, że obiekt jest połowę przeźroczysty i połowę błyszczący.</p>
 
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vPosition.y;
+    float stripes = mod((y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), vNormal);
+    // fresnel = pow(fresnel, 3.0);
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(1.0), fresnel);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+
+</code></pre>
     `,
 	},
 	{
@@ -702,13 +1239,45 @@ float fresnel = dot(viewDir, vNormal);</code></pre>
 <p>Dodano do wartości Fresnela przesunięcie o <code>+1.0</code>: <code>fresnel = dot(...) + 1.0;</code>. Dzięki temu
   wartość wyjściowa nie zaczyna się od zera (czyli od pełnej przezroczystości), tylko przesuwa cały zakres w górę, co
   sprawia, że efekt jest bardziej widoczny nawet przy mniejszym kącie.</p>
+
 <p>Po dodaniu <code>+1.0</code>, nałożono jeszcze <code>pow(fresnel, 3.0)</code>, co pozwala lepiej kontrolować kształt
   krzywej – nadaje ona przezroczystości nieliniowy, bardziej dramatyczny wzrost przy ostrych kątach widzenia.</p>
+
 <p>Wartość końcowego kanału alfa to teraz wynik przekształconego Fresnela:
   <code>vec4 color = vec4(vec3(1.0), fresnel);</code>. Dzięki temu geometria jeszcze bardziej rozmywa się w centrum i
   pojawia wyraźniej na krawędziach, ale bardziej płynnie i intensywnie niż w poprzedniej wersji.</p>
+
 <p>Efekt pasków <code>stripes</code> nadal jest liczony, ale nie wpływa na kolor — może zostać wykorzystany później lub
   usunięty, jeśli niepotrzebny.</p>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vPosition.y;
+    float stripes = mod((y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), vNormal) + 1.0;
+    fresnel = pow(fresnel, 3.0);
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(1.0), fresnel);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
     `,
 	},
 	{
@@ -726,6 +1295,40 @@ float fresnel = dot(viewDir, vNormal);</code></pre>
 <p><strong>Efekt końcowy:</strong>
 </p> <p>Shader wygląda teraz jak 
 bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na krawędziach. Środek obiektu ma delikatniejsze paski, a kontury są bardziej wyraźne i dynamiczne.</p>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // wyciągnięcie wartości y z uv
+    float y = vPosition.y;
+    float stripes = mod((y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), vNormal) + 1.0;
+    fresnel = pow(fresnel, 3.0);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 1.25;
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(1.0), holo);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
+
+
     `,
 	},
 	{
@@ -746,6 +1349,41 @@ bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na kraw
 <p>Końcowa wartość przezroczystości (<code>alpha</code>) nadal opiera się na połączeniu pasków i Fresnela, co daje
   bardziej dynamiczny efekt hologramu, teraz jednak poprawnie działający również na „odwrocie” obiektu.</p>
 
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing){
+        normal *= - 1.0;
+    }
+    // wyciągnięcie wartości y z uv
+    float stripes = mod((vPosition.y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
+    fresnel = pow(fresnel, 3.0);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 1.25;
+
+    // Kolor finalny
+    vec4 color = vec4(vec3(1.0), holo);
+    gl_FragColor = color;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
     `,
 	},
 	{
@@ -766,6 +1404,262 @@ bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na kraw
 <p>Na końcu wynikowy kolor jest uzyskiwany przez połączenie koloru obliczonego z Fresnelem oraz efektu
   <code>falloff</code>, który wygładza przejścia, co daje bardziej subtelną wizualizację hologramu. Całość jest
   następnie przekształcana na odpowiednią wartość alpha, co pozwala na uzyskanie głębszego efektu przezroczystości.</p>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+
+uniform float uFrequency;
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uFalloff;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing){
+        normal *= - 1.0;
+    }
+    // wyciągnięcie wartości y z uv
+    float stripes = mod((vPosition.y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
+    fresnel = pow(fresnel, 3.0);
+
+    // Falloff
+    float falloff = smoothstep(uFalloff, 0.0, fresnel);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 1.25;
+    holo *= falloff;
+    
+    // Kolor finalny
+    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
+    vec4 finalColor = vec4(colorRGB, holo);
+    gl_FragColor = finalColor;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+
+</code></pre>
+
+<label>Canvas3D.ts</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import GUI from "lil-gui";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import vertexShader from "../shaders/vertex.glsl";
+import fragmentShader from "../shaders/fragment.glsl";
+
+type RendererParameters = {
+	bgColor: string;
+	frequency: number;
+	falloff: number;
+	color: THREE.Color;
+};
+class Canvas3D {
+	private gui: GUI;
+	private canvas: HTMLCanvasElement;
+	private scene: THREE.Scene;
+	private gltfLoader: GLTFLoader;
+	private sizes: { width: number; height: number };
+	private camera: THREE.PerspectiveCamera;
+	private controls: OrbitControls;
+	private rendererParameters: RendererParameters;
+	private renderer: THREE.WebGLRenderer;
+	private material: THREE.ShaderMaterial | undefined;
+	private model: THREE.Group | null = null;
+	private clock: THREE.Clock;
+	constructor(canvasSelector: string) {
+		// Debug
+		this.gui = new GUI();
+
+		// Canvas
+		const canvasElement = document.querySelector(canvasSelector);
+		if (!canvasElement) {
+      throw new Error(
+        \`Canvas element with selector \${canvasSelector} not found\`
+      );
+		}
+		this.canvas = canvasElement as HTMLCanvasElement;
+
+		// Scene
+		this.scene = new THREE.Scene();
+
+		// Loaders
+		this.gltfLoader = new GLTFLoader();
+
+		// Sizes
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+		};
+
+		// Camera
+		this.camera = new THREE.PerspectiveCamera(
+			10,
+			this.sizes.width / this.sizes.height,
+			0.1,
+			100
+		);
+		this.camera.position.set(5, 5, 5);
+		this.scene.add(this.camera);
+
+		// Controls
+		this.controls = new OrbitControls(this.camera, this.canvas);
+		this.controls.enableDamping = true;
+
+		// Renderer
+		this.rendererParameters = {
+			bgColor: "#1d1f2a",
+			frequency: 20,
+			falloff: 0.8,
+			color: new THREE.Color("#00ff00"),
+		};
+
+		this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvas,
+			antialias: true,
+		});
+		this.renderer.setClearColor(this.rendererParameters.bgColor);
+		this.renderer.setSize(this.sizes.width, this.sizes.height);
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+		// Clock
+		this.clock = new THREE.Clock();
+
+		// Setup
+		this.setupEventListeners();
+		this.setupGUI();
+		this.createMaterial();
+		this.loadModel();
+		this.animate();
+	}
+
+	private setupEventListeners(): void {
+		window.addEventListener("resize", () => {
+			// Update sizes
+			this.sizes.width = window.innerWidth;
+			this.sizes.height = window.innerHeight;
+
+			// Update camera
+			this.camera.aspect = this.sizes.width / this.sizes.height;
+			this.camera.updateProjectionMatrix();
+
+			// Update renderer
+			this.renderer.setSize(this.sizes.width, this.sizes.height);
+			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		});
+	}
+
+	private setupGUI(): void {
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
+		});
+		this.gui
+			.add(this.rendererParameters, "frequency")
+			.min(1)
+			.max(50)
+			.step(1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFrequency.value =
+						this.rendererParameters.frequency;
+				}
+			});
+		this.gui
+			.add(this.rendererParameters, "falloff")
+			.min(0)
+			.max(1)
+			.step(0.1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFalloff.value =
+						this.rendererParameters.falloff;
+				}
+			});
+		this.gui.addColor(this.rendererParameters, "color").onChange(() => {
+			if (this.material) {
+				this.material.uniforms.uColor.value = this.rendererParameters.color;
+			}
+		});
+	}
+
+	private createMaterial(): void {
+		this.material = new THREE.ShaderMaterial({
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			// depthTest: false,
+			depthWrite: false,
+			side: 2,
+			uniforms: {
+				uFrequency: { value: this.rendererParameters.frequency },
+				uTime: { value: 0 },
+				uFalloff: { value: this.rendererParameters.falloff },
+				uColor: { value: this.rendererParameters.color },
+			},
+		});
+	}
+
+	private loadModel(): void {
+		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+			this.model = gltf.scene;
+			this.model.traverse((child) => {
+				if (child instanceof THREE.Mesh) child.material = this.material;
+			});
+
+			// Centrowanie modelu
+			const box = new THREE.Box3().setFromObject(this.model);
+			const center = box.getCenter(new THREE.Vector3());
+			this.model.position.x -= center.x;
+			this.model.position.y -= center.y;
+			this.model.position.z -= center.z;
+
+			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
+			const size = box.getSize(new THREE.Vector3()).length();
+			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
+
+			this.camera.position.set(0, 0, distance);
+			this.camera.lookAt(0, 0, 0);
+			this.controls.update();
+
+			this.scene.add(this.model);
+		});
+	}
+
+	private animate(): void {
+		const tick = () => {
+			const elapsedTime = this.clock.getElapsedTime();
+
+			// Update material
+			if (this.material) {
+				this.material.uniforms.uTime.value = elapsedTime;
+			}
+			this.controls.update();
+			// Render
+			this.renderer.render(this.scene, this.camera);
+
+			// Call tick again on the next frame
+			window.requestAnimationFrame(tick);
+		};
+
+		tick();
+	}
+}
+
+export const canvas3D = new Canvas3D(".webgl");
+
+</code></pre>
 
     `,
 	},
@@ -790,6 +1684,303 @@ bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na kraw
 <p>Warto zauważyć, że dzięki zastosowaniu <code>glitch</code> w vertex shaderze, geometria modelu zmienia się w sposób
   nieregularny, co nadaje jej bardziej chaotyczny, zakłócony wygląd. Efekt ten może być używany do uzyskania bardziej
   dramatycznych, niestabilnych wizualizacji w połączeniu z holograficznym efektem. </p>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uFalloff;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing){
+        normal *= - 1.0;
+    }
+    // wyciągnięcie wartości y z uv
+    float stripes = mod((vPosition.y- uTime * 0.1) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
+    fresnel = pow(fresnel, 3.0);
+
+    // Falloff
+    float falloff = smoothstep(uFalloff, 0.0, fresnel);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 1.25;
+    holo *= falloff;
+    
+    // Kolor finalny
+    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
+    vec4 finalColor = vec4(colorRGB, holo);
+    gl_FragColor = finalColor;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
+
+<p>Trzeba też dodać nową funkcję np. w folderze <code>utils</code> w pliku <code>random2d.glsl</code>.</p>
+
+<label>random2d.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+}
+</code></pre>
+
+<label>vertex.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+#include "./utils/random2d.glsl"
+
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Glitch
+    modelPosition.x += random2D(modelPosition.xz + uTime);
+    modelPosition.z += random2D(modelPosition.zx + uTime);
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+    // Normal model
+    vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+
+
+    // Varyings
+    vPosition = modelPosition.xyz;
+    vNormal = modelNormal.xyz;
+}
+</code></pre>
+
+<label>Canvas3D.ts</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import GUI from "lil-gui";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import vertexShader from "../shaders/vertex.glsl";
+import fragmentShader from "../shaders/fragment.glsl";
+
+type RendererParameters = {
+	bgColor: string;
+	frequency: number;
+	falloff: number;
+	color: THREE.Color;
+};
+class Canvas3D {
+	private gui: GUI;
+	private canvas: HTMLCanvasElement;
+	private scene: THREE.Scene;
+	private gltfLoader: GLTFLoader;
+	private sizes: { width: number; height: number };
+	private camera: THREE.PerspectiveCamera;
+	private controls: OrbitControls;
+	private rendererParameters: RendererParameters;
+	private renderer: THREE.WebGLRenderer;
+	private material: THREE.ShaderMaterial | undefined;
+	private model: THREE.Group | null = null;
+	private clock: THREE.Clock;
+	constructor(canvasSelector: string) {
+		// Debug
+		this.gui = new GUI();
+
+		// Canvas
+		const canvasElement = document.querySelector(canvasSelector);
+		if (!canvasElement) {
+			throw new Error(
+				\`Canvas element with selector \${canvasSelector} not found\`
+			);
+		}
+		this.canvas = canvasElement as HTMLCanvasElement;
+
+		// Scene
+		this.scene = new THREE.Scene();
+
+		// Loaders
+		this.gltfLoader = new GLTFLoader();
+
+		// Sizes
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+		};
+
+		// Camera
+		this.camera = new THREE.PerspectiveCamera(
+			10,
+			this.sizes.width / this.sizes.height,
+			0.1,
+			100
+		);
+		this.camera.position.set(5, 5, 5);
+		this.scene.add(this.camera);
+
+		// Controls
+		this.controls = new OrbitControls(this.camera, this.canvas);
+		this.controls.enableDamping = true;
+
+		// Renderer
+		this.rendererParameters = {
+			bgColor: "#1d1f2a",
+			frequency: 20,
+			falloff: 0.8,
+			color: new THREE.Color("#00ff00"),
+		};
+
+		this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvas,
+			antialias: true,
+		});
+		this.renderer.setClearColor(this.rendererParameters.bgColor);
+		this.renderer.setSize(this.sizes.width, this.sizes.height);
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+		// Clock
+		this.clock = new THREE.Clock();
+
+		// Setup
+		this.setupEventListeners();
+		this.setupGUI();
+		this.createMaterial();
+		this.loadModel();
+		this.animate();
+	}
+
+	private setupEventListeners(): void {
+		window.addEventListener("resize", () => {
+			// Update sizes
+			this.sizes.width = window.innerWidth;
+			this.sizes.height = window.innerHeight;
+
+			// Update camera
+			this.camera.aspect = this.sizes.width / this.sizes.height;
+			this.camera.updateProjectionMatrix();
+
+			// Update renderer
+			this.renderer.setSize(this.sizes.width, this.sizes.height);
+			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		});
+	}
+
+	private setupGUI(): void {
+		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
+			this.renderer.setClearColor(this.rendererParameters.bgColor);
+		});
+		this.gui
+			.add(this.rendererParameters, "frequency")
+			.min(1)
+			.max(50)
+			.step(1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFrequency.value =
+						this.rendererParameters.frequency;
+				}
+			});
+		this.gui
+			.add(this.rendererParameters, "falloff")
+			.min(0)
+			.max(1)
+			.step(0.1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFalloff.value =
+						this.rendererParameters.falloff;
+				}
+			});
+		this.gui.addColor(this.rendererParameters, "color").onChange(() => {
+			if (this.material) {
+				this.material.uniforms.uColor.value = this.rendererParameters.color;
+			}
+		});
+	}
+
+	private createMaterial(): void {
+		this.material = new THREE.ShaderMaterial({
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			// depthTest: false,
+			depthWrite: false,
+			side: 2,
+			uniforms: {
+				uFrequency: { value: this.rendererParameters.frequency },
+				uTime: { value: 0 },
+				uFalloff: { value: this.rendererParameters.falloff },
+				uColor: { value: this.rendererParameters.color },
+			},
+		});
+	}
+
+	private loadModel(): void {
+		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+			this.model = gltf.scene;
+			this.model.traverse((child) => {
+				if (child instanceof THREE.Mesh) child.material = this.material;
+			});
+
+			// Centrowanie modelu
+			const box = new THREE.Box3().setFromObject(this.model);
+			const center = box.getCenter(new THREE.Vector3());
+			this.model.position.x -= center.x;
+			this.model.position.y -= center.y;
+			this.model.position.z -= center.z;
+
+			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
+			const size = box.getSize(new THREE.Vector3()).length();
+			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
+
+			this.camera.position.set(0, 0, distance);
+			this.camera.lookAt(0, 0, 0);
+			this.controls.update();
+
+			this.scene.add(this.model);
+		});
+	}
+
+	private animate(): void {
+		const tick = () => {
+			const elapsedTime = this.clock.getElapsedTime();
+
+			// Update material
+			if (this.material) {
+				this.material.uniforms.uTime.value = elapsedTime;
+			}
+			this.controls.update();
+			// Render
+			this.renderer.render(this.scene, this.camera);
+
+			// Call tick again on the next frame
+			window.requestAnimationFrame(tick);
+		};
+
+		tick();
+	}
+}
+
+export const canvas3D = new Canvas3D(".webgl");
+
+</code></pre>
 
     `,
 	},
@@ -822,6 +2013,118 @@ bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na kraw
 
 <p>W efekcie całość tworzy dynamiczny, glitchowy wygląd z subtelnym efektem hologramu, który zmienia się w czasie.
  Zakłócenia w pozycjonowaniu wierzchołków oraz zmienne, wyraźniejsze przejścia na krawędziach obiektów tworzą interesujący, nieco niestabilny efekt wizualny.</p>
+
+
+<label>vertex.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+#include "./utils/random2d.glsl"
+
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Glitch
+    // Generujemy losowe "ziarna" dla różnych aspektów glitcha
+    float glitchSeed = floor(uTime * 0.5); // Zmienia się co 2 sekundy
+    float nextGlitchSeed = glitchSeed + 1.0; // Następne ziarno
+    float transitionFactor = fract(uTime * 0.5); // Współczynnik przejścia między ziarnami
+    
+    // Interpolujemy między bieżącym a następnym ziarnem
+    float locationSeed = mix(
+        random2D(vec2(glitchSeed, 0.0)),
+        random2D(vec2(nextGlitchSeed, 0.0)),
+        smoothstep(0.8, 1.0, transitionFactor) // Płynne przejście pod koniec cyklu
+    );
+    
+    float durationSeed = mix(
+        random2D(vec2(glitchSeed, 1.0)),
+        random2D(vec2(nextGlitchSeed, 1.0)),
+        smoothstep(0.8, 1.0, transitionFactor)
+    );
+    
+    // Określamy centrum glitcha (losowe miejsce)
+    float glitchCenterY = -5.0 + locationSeed * 10.0;
+    
+    // Glitch porusza się w górę z losową prędkością
+    float glitchSpeed = 1.0 + durationSeed * 2.0; // Prędkość między 1.0 a 3.0
+    float movingGlitchY = glitchCenterY + mod(uTime * glitchSpeed, 15.0); // Porusza się w górę i resetuje
+
+    // Siła glitcha zależy od odległości od poruszającego się centrum
+    float glitchDistance = abs(modelPosition.y - movingGlitchY);
+    float glitchStrength = smoothstep(1.5, 0.0, glitchDistance); // Silniejszy bliżej centrum
+    
+    // Dodajemy losowe fluktuacje do siły glitcha
+    glitchStrength *= sin(uTime * 4.0 + modelPosition.y) * 0.5 + 0.5;
+    
+    // Dodajemy płynne wygaszanie przy zmianie ziarna
+    glitchStrength *= 1.0 - smoothstep(0.7, 0.99, transitionFactor);
+    
+    glitchStrength *= 0.15; // Kontrola ogólnej siły efektu
+    
+    // Aplikujemy glitch
+    modelPosition.x += (random2D(modelPosition.xz + uTime * 0.5) - 0.5) * glitchStrength;
+    modelPosition.z += (random2D(modelPosition.zx + uTime * 0.7) - 0.5) * glitchStrength;
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+    // Normal model
+    vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+    // Varyings
+    vPosition = modelPosition.xyz;
+    vNormal = modelNormal.xyz;
+}
+</code></pre>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uFalloff;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing){
+        normal *= - 1.0;
+    }
+    // wyciągnięcie wartości y z uv
+    float stripes = mod((vPosition.y- uTime * 0.2) * uFrequency, 1.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
+    fresnel = pow(fresnel, 2.0);
+
+    // Falloff
+    float falloff = smoothstep(uFalloff, 0.0, fresnel);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 0.75;
+    holo *= falloff;
+    
+    // Kolor finalny
+    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
+    vec4 finalColor = vec4(colorRGB, holo);
+    gl_FragColor = finalColor;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
     `,
 	},
 	{
@@ -860,6 +2163,414 @@ bardziej zaawansowany hologram, gdzie paski się ruszają i świeci się na kraw
 </ul>
 
 <p>W efekcie całość tworzy dynamiczny, glitchowy wygląd z subtelnym efektem hologramu, który zmienia się w czasie. Zakłócenia w pozycjonowaniu wierzchołków oraz zmienne, wyraźniejsze przejścia na krawędziach obiektów tworzą interesujący, nieco niestabilny efekt wizualny. Dzięki dynamicznej interakcji z użytkownikiem, efekt staje się bardziej interaktywny i responsywny na działania użytkownika.</p>
+
+<label>vertex.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+#include "./utils/random2d.glsl"
+
+uniform float uTime;
+uniform float uHoverGlitch;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Glitch
+    // Generujemy losowe "ziarna" dla różnych aspektów glitcha
+    float glitchSeed = floor(uTime * 0.8);
+    float nextGlitchSeed = glitchSeed + 1.0;
+    float transitionFactor = fract(uTime * 0.8);
+    
+    
+    // Interpolujemy między bieżącym a następnym ziarnem
+    float locationSeed = mix(
+        random2D(vec2(glitchSeed, 0.0)),
+        random2D(vec2(nextGlitchSeed, 0.0)),
+        smoothstep(0.8, 1.0, transitionFactor) // Płynne przejście pod koniec cyklu
+    );
+    
+    float durationSeed = mix(
+        random2D(vec2(glitchSeed, 1.0)),
+        random2D(vec2(nextGlitchSeed, 1.0)),
+        smoothstep(0.8, 1.0, transitionFactor)
+    );
+    
+    // Określamy centrum glitcha (losowe miejsce)
+    float glitchCenterY = -5.0 + locationSeed * 10.0;
+    float glitchCenterY2 = 0.0 + random2D(vec2(glitchSeed + 0.5, 0.3)) * 10.0 - 5.0;
+    
+    
+    // Glitch porusza się w górę z losową prędkością
+    float glitchSpeed = 1.0 + durationSeed * 2.0;
+    float movingGlitchY = glitchCenterY + mod(uTime * glitchSpeed, 15.0);
+    float movingGlitchY2 = glitchCenterY2 + mod(uTime * (glitchSpeed * 0.7), 15.0); // Drugi glitch z inną prędkością
+    
+
+    // Siła glitcha zależy od odległości od poruszającego się centrum
+    float glitchDistance = min(
+        abs(modelPosition.y - movingGlitchY),
+        abs(modelPosition.y - movingGlitchY2)
+    );
+    float glitchStrength = smoothstep(1.8, 0.0, glitchDistance); // Zwiększony zasięg
+    
+    // Dodajemy losowe fluktuacje do siły glitcha
+    glitchStrength *= sin(uTime * 4.0 + modelPosition.y) * 0.5 + 0.5;
+    
+    // Dodajemy dodatkowy czynnik, który zapewnia, że glitch pojawia się regularnie
+    float regularGlitch = step(0.7, sin(uTime * 0.4) * 0.5 + 0.5); // Regularny puls co kilka sekund
+    glitchStrength = max(glitchStrength, regularGlitch * 0.1 * (random2D(vec2(position.x + uTime, position.y - uTime)) * 0.8 + 0.2));
+    
+    // Dodajemy płynne wygaszanie przy zmianie ziarna
+    glitchStrength *= 1.0 - smoothstep(0.7, 1.0, transitionFactor);
+    
+    glitchStrength *= 0.2; // Zwiększona ogólna siła efektu
+    
+    // Dodajemy efekt glitcha przy najechaniu myszą
+    float hoverGlitchEffect = random2D(vec2(position.x * 50.0 + uTime, position.y * 50.0 - uTime)) * uHoverGlitch * 0.2;
+    
+    // Aplikujemy glitch
+    modelPosition.x += (random2D(modelPosition.xz + uTime * 0.5) - 0.5) * glitchStrength;
+    modelPosition.z += (random2D(modelPosition.zx + uTime * 0.7) - 0.5) * glitchStrength;
+    
+    // Aplikujemy glitch przy najechaniu
+    modelPosition.x += (random2D(position.xy + uTime * 2.0) - 0.5) * hoverGlitchEffect;
+    modelPosition.y += (random2D(position.yz + uTime * 1.5) - 0.5) * hoverGlitchEffect;
+    modelPosition.z += (random2D(position.zx + uTime * 1.8) - 0.5) * hoverGlitchEffect;
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+    // Normal model
+    vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+    // Varyings
+    vPosition = modelPosition.xyz;
+    vNormal = modelNormal.xyz;
+}
+</code></pre>
+
+<label>fragment.glsl</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+uniform float uFrequency;
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uFalloff;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing){
+        normal *= - 1.0;
+    }
+    // wyciągnięcie wartości y z uv
+    float stripes = mod((vPosition.y- uTime * 0.2) * uFrequency, 1.0);
+    stripes = pow(stripes, 2.0);
+
+    // Fresnel
+    vec3 viewDirection = vPosition - cameraPosition;
+    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
+    fresnel = fresnel * 0.9;
+
+    // Falloff
+    float falloff = smoothstep(uFalloff, 0.0, fresnel);
+
+    float holo = stripes * fresnel;
+    holo += fresnel * 0.75;
+    holo *= falloff;
+    
+    // Kolor finalny
+    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
+    vec4 finalColor = vec4(colorRGB, holo);
+    gl_FragColor = finalColor;
+    // Tonemapping z Three.js
+    #include <tonemapping_fragment>
+    // Colorspace z Three.js
+    #include <colorspace_fragment>
+}
+</code></pre>
+
+<label>Canvas3D.ts</label>
+<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import GUI from "lil-gui";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import vertexShader from "../shaders/vertex.glsl";
+import fragmentShader from "../shaders/fragment.glsl";
+
+type RendererParameters = {
+	frequency: number;
+	falloff: number;
+	color: THREE.Color;
+	hoverGlitchIntensity: number;
+};
+class Canvas3D {
+	private gui: GUI;
+	private canvas: HTMLCanvasElement;
+	private scene: THREE.Scene;
+	private gltfLoader: GLTFLoader;
+	private sizes: { width: number; height: number };
+	private camera: THREE.PerspectiveCamera;
+	private controls: OrbitControls;
+	private rendererParameters: RendererParameters;
+	private renderer: THREE.WebGLRenderer;
+	private material: THREE.ShaderMaterial | undefined;
+	private model: THREE.Group | null = null;
+	private clock: THREE.Clock;
+	private mouseOver: boolean = false;
+	private hoverGlitchIntensity: number = 0;
+	constructor(canvasSelector: string) {
+		// Debug
+		this.gui = new GUI();
+
+		// Canvas
+		const canvasElement = document.querySelector(canvasSelector);
+		if (!canvasElement) {
+			throw new Error(
+				\`Canvas element with selector \${canvasSelector} not found\`
+			);
+		}
+		this.canvas = canvasElement as HTMLCanvasElement;
+
+		// Scene
+		this.scene = new THREE.Scene();
+
+		// Loaders
+		this.gltfLoader = new GLTFLoader();
+
+		// Sizes
+		this.sizes = {
+			width: window.innerWidth,
+			height: window.innerHeight,
+		};
+
+		// Camera
+		this.camera = new THREE.PerspectiveCamera(
+			10,
+			this.sizes.width / this.sizes.height,
+			0.1,
+			100
+		);
+		this.camera.position.set(5, 5, 5);
+		this.scene.add(this.camera);
+
+		// Controls
+		this.controls = new OrbitControls(this.camera, this.canvas);
+		this.controls.enableDamping = true;
+
+		// Renderer
+		this.rendererParameters = {
+			frequency: 20,
+			falloff: 0.8,
+			color: new THREE.Color("#004cff"),
+			hoverGlitchIntensity: 0.0,
+		};
+
+		this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvas,
+			antialias: true,
+		});
+		this.renderer.setSize(this.sizes.width, this.sizes.height);
+		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+		// Clock
+		this.clock = new THREE.Clock();
+
+		// Setup
+		this.setupEventListeners();
+		this.setupGUI();
+		this.createMaterial();
+		this.loadModel();
+		this.animate();
+	}
+
+	private setupEventListeners(): void {
+		window.addEventListener("resize", () => {
+			// Update sizes
+			this.sizes.width = window.innerWidth;
+			this.sizes.height = window.innerHeight;
+
+			// Update camera
+			this.camera.aspect = this.sizes.width / this.sizes.height;
+			this.camera.updateProjectionMatrix();
+
+			// Update renderer
+			this.renderer.setSize(this.sizes.width, this.sizes.height);
+			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		});
+
+		// Raycaster dla detekcji najechania na mesh
+		const raycaster = new THREE.Raycaster();
+		const mouse = new THREE.Vector2();
+
+		// Dodajemy zmienną do śledzenia ostatniego stanu
+		let lastMouseOver = false;
+
+		// Dodajemy throttling dla obsługi ruchu myszy
+		let lastMoveTime = 0;
+		const throttleTime = 50; // ms
+
+		// Obsługa ruchu myszy z throttlingiem
+		this.canvas.addEventListener("mousemove", (event) => {
+			const now = performance.now();
+			if (now - lastMoveTime < throttleTime) return;
+			lastMoveTime = now;
+
+			// Obliczenie pozycji myszy w przestrzeni znormalizowanej (-1 do 1)
+			mouse.x = (event.clientX / this.sizes.width) * 2 - 1;
+			mouse.y = -(event.clientY / this.sizes.height) * 2 + 1;
+
+			// Aktualizacja raycaster'a
+			raycaster.setFromCamera(mouse, this.camera);
+
+			// Sprawdzenie czy promień przecina model
+			if (this.model) {
+				const intersects = raycaster.intersectObject(this.model, true);
+				const newMouseOver = intersects.length > 0;
+
+				// Aktualizujemy stan tylko jeśli się zmienił
+				if (newMouseOver !== lastMouseOver) {
+					this.mouseOver = newMouseOver;
+					lastMouseOver = newMouseOver;
+				}
+			}
+		});
+	}
+
+	private setupGUI(): void {
+		this.gui
+			.add(this.rendererParameters, "frequency")
+			.min(1)
+			.max(50)
+			.step(1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFrequency.value =
+						this.rendererParameters.frequency;
+				}
+			});
+		this.gui
+			.add(this.rendererParameters, "falloff")
+			.min(0)
+			.max(1)
+			.step(0.1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uFalloff.value =
+						this.rendererParameters.falloff;
+				}
+			});
+		this.gui.addColor(this.rendererParameters, "color").onChange(() => {
+			if (this.material) {
+				this.material.uniforms.uColor.value = this.rendererParameters.color;
+			}
+		});
+
+		this.gui
+			.add(this.rendererParameters, "hoverGlitchIntensity")
+			.min(0)
+			.max(1)
+			.step(0.1)
+			.onChange(() => {
+				if (this.material) {
+					this.material.uniforms.uHoverGlitch.value =
+						this.rendererParameters.hoverGlitchIntensity;
+				}
+			});
+	}
+
+	private createMaterial(): void {
+		this.material = new THREE.ShaderMaterial({
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			depthTest: false,
+			depthWrite: false,
+			side: 2,
+			uniforms: {
+				uFrequency: { value: this.rendererParameters.frequency },
+				uTime: { value: 0 },
+				uFalloff: { value: this.rendererParameters.falloff },
+				uColor: { value: this.rendererParameters.color },
+				uHoverGlitch: { value: 0.0 },
+			},
+		});
+	}
+
+	private loadModel(): void {
+		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+			this.model = gltf.scene;
+			this.model.traverse((child) => {
+				if (child instanceof THREE.Mesh) child.material = this.material;
+			});
+
+			// Centrowanie modelu
+			const box = new THREE.Box3().setFromObject(this.model);
+			const center = box.getCenter(new THREE.Vector3());
+			this.model.position.x -= center.x;
+			this.model.position.y -= center.y;
+			this.model.position.z -= center.z;
+
+			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
+			const size = box.getSize(new THREE.Vector3()).length();
+			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
+
+			this.camera.position.set(0, 0, distance);
+			this.camera.lookAt(0, 0, 0);
+			this.controls.update();
+
+			this.scene.add(this.model);
+		});
+	}
+
+	private animate(): void {
+		const tick = () => {
+			const elapsedTime = this.clock.getElapsedTime();
+			// Update material
+			if (this.material) {
+				this.material.uniforms.uTime.value = elapsedTime;
+
+				// Aktualizujemy intensywność glitcha przy najechaniu
+				if (this.mouseOver && this.hoverGlitchIntensity < 0.6) {
+					this.hoverGlitchIntensity += 0.02;
+				} else if (!this.mouseOver && this.hoverGlitchIntensity > 0.0) {
+					this.hoverGlitchIntensity -= 0.02;
+				}
+				// console.log("mouseOver", this.mouseOver); // Zakomentowane lub usunięte
+
+				this.hoverGlitchIntensity = Math.max(
+					0,
+					Math.min(1, this.hoverGlitchIntensity)
+				);
+				this.material.uniforms.uHoverGlitch.value =
+					this.hoverGlitchIntensity;
+			}
+
+			this.controls.update();
+			// Render
+			this.renderer.render(this.scene, this.camera);
+
+			// Call tick again on the next frame
+			window.requestAnimationFrame(tick);
+		};
+
+		tick();
+	}
+}
+
+export const canvas3D = new Canvas3D(".webgl");
+
+
+</code></pre>
 
     `,
 	},

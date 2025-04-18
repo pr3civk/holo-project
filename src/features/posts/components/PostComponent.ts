@@ -92,21 +92,6 @@ export class PostComponent extends HTMLElement {
         }
       </style>
           <article>
-        <h2 class="post-title">${post.title}</h2>
-              ${
-						post.githubCode && Object.entries(post.githubCode).length > 0
-							? `<div class="github-container">
-                  <h3 class="github-title">Linki do kodu:</h3>
-                  ${Object.entries(post.githubCode)
-							.map(([key, value]) => {
-								return `<a href="${value}" target="_blank" rel="noopener noreferrer" class="github-link" style="display: block; margin-bottom: 8px; color: #0366d6; text-decoration: none;">
-                        <span style="font-weight: bold;">${key.toUpperCase()}:</span> ${value}
-                      </a>`;
-							})
-							.join("")}
-                </div>`
-							: ""
-					}
         <div class="post-content">${post.content}</div>
         <div class="iframe-container">
           <div class="loader" id="loader-${post.id}"></div>
