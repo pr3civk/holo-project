@@ -5,10 +5,9 @@ import { type Post } from "./types/Post";
 export const posts: Post[] = [
 	{
 		id: "0",
-		title: "Inicjalizacja projektu",
+		title: "Omówienie i inicjalizacja projektu Three.js",
 		content: `
   <section class="post-content">
-		<h3>Opis:</h3>
     <p>
       Three.js to jedna z najpopularniejszych bibliotek JavaScript służących do tworzenia grafiki
       trójwymiarowej w przeglądarce internetowej. Opiera się na technologii WebGL i umożliwia budowę
@@ -249,10 +248,9 @@ body
 	},
 	{
 		id: "1",
-		title: "O shaderach",
+		title: "Shadery i interfejs GUI w Three.js",
 		content: `
       <section>
-			<h3>Opis:</h3>
         <p>
           Współczesne aplikacje 3D w przeglądarkach coraz częściej wykorzystują niestandardowe shadery oraz interaktywne
           interfejsy użytkownika do manipulowania parametrami renderowania w czasie rzeczywistym. Three.js, jako rozbudowana
@@ -365,7 +363,6 @@ const material = new THREE.ShaderMaterial({
 		title: "Tworzenie gradientu z użyciem shaderów",
 		content: `
 	<section>
-		<h3>Opis:</h3>
     <p>
       Shader fragmentów dokonuje obliczeń koloru końcowego piksela. W tym przypadku jego działanie opiera się na prostym
       przekształceniu – odczytywana jest wartość <code>x</code> ze współrzędnych UV (czyli poziome położenie piksela na
@@ -410,7 +407,7 @@ void main()
 		title: "Tworzenie efektu 'żaluzji' z użyciem shaderów",
 		content: `
       <section>
-			<h3>Opis:</h3>
+
   <p>
     Zamieniając <code>uv</code> na <code>vPosition</code> w shaderze wierzchołkowym, mamy większą kontrolę nad obiektem.
     Shader wierzchołkowy przekształca pozycję wierzchołków z przestrzeni modelu na przestrzeń kamery oraz zapewnia
@@ -427,18 +424,19 @@ void main()
   <label>vertex.glsl</label>
   <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
   <code>
-    varying vec3 vPosition;
+varying vec3 vPosition;
 
-    void main() {
-        // Pozycja modelu
-        vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+void main() 
+{
+// Pozycja modelu
+vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-        // Finalna pozycja
-        gl_Position = projectionMatrix * viewMatrix * modelPosition;
+// Finalna pozycja
+gl_Position = projectionMatrix * viewMatrix * modelPosition;
 
-        // Przesyłanie danych do fragmentu
-        vPosition = modelPosition.xyz;
-    }
+// Przesyłanie danych do fragmentu
+vPosition = modelPosition.xyz;
+}
   </code></pre>
 
   <label>fragment.glsl</label>
@@ -476,7 +474,7 @@ void main()
 	},
 	{
 		id: "4",
-		title: "Wczytanie modelu, jak znalezc darmowy model",
+		title: "Wczytywanie modeli 3D w formacie GLTF",
 		content: `
       <section>
   <p>
@@ -693,10 +691,10 @@ export const canvas3D = new Canvas3D(".webgl");
 	},
 	{
 		id: "5",
-		title: "Potwierdzenie, że domyślnie model 3d ma materiał w THREE.js",
+		title: "Materiały domyślne modeli 3D w Three.js",
 		content: `
         <section>
-				<h3>Opis:</h3>
+	
     <p>
      Potwierdznie, że domyślnie model 3d ma materiał.
     </p>
@@ -716,33 +714,33 @@ this.material = new THREE.MeshBasicMaterial();
 
 private loadModel(): void {
 // Wczytanie modelu R2-D2 z pliku GLTF
-	this.gltfLoader.load("/R2-D2.glb", (gltf) => {
-		this.model = gltf.scene; // Przypisanie wczytanej sceny do zmiennej model
-		// Przejście przez wszystkie elementy modelu
-		this.model.traverse((child) => {
-			// Zastąpienie materiałów wszystkich siatek naszym materiałem
-			if (child instanceof THREE.Mesh) child.material = this.material;
-		});
+this.gltfLoader.load("/R2-D2.glb", (gltf) => {
+	this.model = gltf.scene; // Przypisanie wczytanej sceny do zmiennej model
+	// Przejście przez wszystkie elementy modelu
+	this.model.traverse((child) => {
+	// Zastąpienie materiałów wszystkich siatek naszym materiałem
+		if (child instanceof THREE.Mesh) child.material = this.material;
+	});
 
-		// Centrowanie modelu
-		const box = new THREE.Box3().setFromObject(this.model); // Obliczenie pudełka ograniczającego
-		const center = box.getCenter(new THREE.Vector3()); // Znalezienie środka modelu
-		// Przesunięcie modelu tak, aby jego środek był w punkcie (0,0,0)
-		this.model.position.x -= center.x;
-		this.model.position.y -= center.y;
-		this.model.position.z -= center.z;
+	// Centrowanie modelu
+	const box = new THREE.Box3().setFromObject(this.model); // Obliczenie pudełka ograniczającego
+	const center = box.getCenter(new THREE.Vector3()); // Znalezienie środka modelu
+	// Przesunięcie modelu tak, aby jego środek był w punkcie (0,0,0)
+	this.model.position.x -= center.x;
+	this.model.position.y -= center.y;
+	this.model.position.z -= center.z;
 
-		// Dostosowanie kamery do rozmiaru modelu
-		const size = box.getSize(new THREE.Vector3()).length(); // Obliczenie rozmiaru modelu
-		const distance = size / Math.tan((Math.PI * this.camera.fov) / 180); // Obliczenie optymalnej odległości kamery
+	// Dostosowanie kamery do rozmiaru modelu
+	const size = box.getSize(new THREE.Vector3()).length(); // Obliczenie rozmiaru modelu
+	const distance = size / Math.tan((Math.PI * this.camera.fov) / 180); // Obliczenie optymalnej odległości kamery
 
-		// Ustawienie kamery w odpowiedniej odległości
-		this.camera.position.set(0, 0, distance);
-		this.camera.lookAt(0, 0, 0); // Skierowanie kamery na środek sceny
-		this.controls.update(); // Aktualizacja kontrolera kamery
+	// Ustawienie kamery w odpowiedniej odległości
+	this.camera.position.set(0, 0, distance);
+	this.camera.lookAt(0, 0, 0); // Skierowanie kamery na środek sceny
+	this.controls.update(); // Aktualizacja kontrolera kamery
 
-		// Dodanie modelu do sceny
-		this.scene.add(this.model);
+	// Dodanie modelu do sceny
+	this.scene.add(this.model);
 	});
 }
     </code>
@@ -755,9 +753,8 @@ private loadModel(): void {
 	},
 	{
 		id: "6",
-		title: "Tworzenie efektu 'żaluzji' na modelu 3d",
+		title: "Implementacja efektu 'żaluzji' na modelu 3D",
 		content: `
-    <h3>Opis:</h3>
     <p>
       W poprzednim etapie stworzyliśmy aplikację renderującą model 3D w Three.js z wykorzystaniem <code>GLTFLoader</code>, 
       <code>OrbitControls</code> i klasycznego materiału <code>MeshBasicMaterial</code>. Model był centrowany w przestrzeni 3D 
@@ -778,11 +775,11 @@ private loadModel(): void {
 
       <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 this.material = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-        uFrequency: { value: this.rendererParameters.frequency },
-    },
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+      uFrequency: { value: this.rendererParameters.frequency },
+  },
 });
     </code></pre>
 
@@ -843,9 +840,9 @@ void main() {
 
     <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 this.gui.add(this.rendererParameters, "frequency").onChange(() => {
-    this.rendererParameters.frequency = this.rendererParameters.frequency;
-    if (this.material) {
-        this.material.uniforms.uFrequency.value = this.rendererParameters.frequency;
+  this.rendererParameters.frequency = this.rendererParameters.frequency;
+  if (this.material) {
+  this.material.uniforms.uFrequency.value = this.rendererParameters.frequency;
     }
 });
     </code></pre>
@@ -855,7 +852,7 @@ this.gui.add(this.rendererParameters, "frequency").onChange(() => {
 	},
 	{
 		id: "7",
-		title: "Stworzenie animacji polegającej na zmianie czasu",
+		title: "Animacja czasowa w shaderach",
 		content: `
  <p>Teraz trzeba dodać nowy uniform <code>uTime</code> do <code>ShaderMaterial</code>, który przekazuje do shadera wartość
   upływającego czasu w sekundach. Dzięki temu możemy tworzyć dynamiczne, zmieniające się w czasie efekty wizualne.</p>
@@ -936,7 +933,7 @@ void main()
 	},
 	{
 		id: "8",
-		title: "Tworzenie przezroczystosci",
+		title: "Implementacja przezroczystości w shaderach",
 		content: `
     <p>
 			W <code>ShaderMaterial</code> trzeba było dodać właściwość <code>transparent: true</code>, co pozwala obsługiwać przezroczystość
@@ -1172,11 +1169,6 @@ varying vec3 vPosition;
 
 void main()
 {
-varying vec3 vPosition;
-
-
-void main()
-{
     // Position
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
@@ -1192,7 +1184,7 @@ void main()
 	},
 	{
 		id: "9",
-		title: "Coś o odbiciu fresnela, mała ilosc teorii i przykład",
+		title: "Efekt Fresnela",
 		content: `
 		<p>
 			<strong>Efekt Fresnela</strong> to zjawisko optyczne, które opisuje, jak światło odbija się od powierzchni w
@@ -1257,7 +1249,7 @@ void main()
 	},
 	{
 		id: "10",
-		title: "Naprawa 'intencjonalnego buga' związanego z odbiciem fresnela",
+		title: "Optymalizacja efektu Fresnela",
 		content: `
 		<p>W klasycznym Fresnelu interesuje nas odwrotność tego — bo to właśnie krawędzie mają być bardziej widoczne:</p>
 <pre><code>float fresnel = 1.0 - dot(viewDir, vNormal);</code></pre>
@@ -1312,7 +1304,7 @@ void main()
 	},
 	{
 		id: "11",
-		title: "Dodanie odbicia fresnela do animacji hologramu",
+		title: "Łączenie efektu Fresnela z animacją hologramu",
 		content: `
      <p>Teraz dodamy wcześniej stworzony efekt animacji hologramu do efektu Fresnela. Poniżej opisuję, co zostało zmienione lub dodane:</p>
 <p><strong>1. Nowa linia: <code>float holo = stripes * fresnel;</code></strong></p> <p>Łączy dwa efekty: poziome pasy (stripes) i Fresnela (czyli krawędziowy błysk), tworząc podstawę efektu przezroczystości.</p>
@@ -1363,7 +1355,7 @@ void main()
 	},
 	{
 		id: "12",
-		title: "Opis o widocznosci elementów modelu wykonczanie podstawowej animacji hologramu",
+		title: "Kontrola widoczności elementów modelu i animacja hologramu",
 		content: `
       <p>
 				Teraz zmienimy sposób obliczania efektu Fresnela, poprzez
@@ -1581,7 +1573,7 @@ void main()
 	},
 	{
 		id: "14",
-		title: "Dokończenie podstawowej animacji glitcha",
+		title: "Implementacja efektu glitch w shaderze wierzchołkowym",
 		content: `
       <p>Teraz dodamy efekt <b>glitch</b>, który jest realizowany w <code>vertex shaderze</code>. Do pozycji wierzchołków
   dodawane są losowe zakłócenia (przesunięcia) na podstawie funkcji <code>random2D</code>, która generuje pseudolosowe
@@ -1647,7 +1639,7 @@ void main()
 	},
 	{
 		id: "15",
-		title: "Wykończanie animacji i efekt on hover",
+		title: "Udoskonalenie animacji glitch z efektem płynnego przejścia",
 		content: `
       <p>Teraz warto naprawić animację glitcha. Przede wszystkim zmienimy sposób generowania losowych zakłóceń.</p>
 			<h3>Vertex Shader:</h3>
