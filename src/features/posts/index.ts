@@ -12,7 +12,7 @@ export const posts: Post[] = [
     <p>
       Three.js to jedna z najpopularniejszych bibliotek JavaScript służących do tworzenia grafiki
       trójwymiarowej w przeglądarce internetowej. Opiera się na technologii WebGL i umożliwia budowę
-      złożonych, interaktywnych scen 3D bez konieczności bezpośredniego pisania kodu WebGL. Jednym z
+      złożonych, interaktywnych scen 3D bez konieczności pisania kodu WebGL. Jednym z
       kluczowych etapów tworzenia aplikacji w oparciu o Three.js jest prawidłowa inicjalizacja sceny,
       która obejmuje stworzenie obiektów takich jak kamera, renderer, scena oraz kontrolery interakcji
       użytkownika.
@@ -27,7 +27,7 @@ export const posts: Post[] = [
     </p>
 
     <label>index.html</label>
-    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff;">
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
       <code>
 &lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
@@ -61,12 +61,12 @@ export const posts: Post[] = [
       Istotnym komponentem jest renderer WebGL, który odpowiada za rzeczywiste wyświetlanie zawartości
       sceny. Ustawiany jest z uwzględnieniem rozmiaru okna oraz rozdzielczości urządzenia, co pozwala na
       zachowanie wysokiej jakości obrazu również na ekranach o podwyższonej gęstości pikseli. Konfiguracja
-      rendererów często obejmuje także antyaliasing, który niweluje efekt „ząbkowania” na krawędziach
+      rendererów często obejmuje także antyaliasing, który niweluje efekt „ząbkowania" na krawędziach
       obiektów.
     </p>
 
     <label>Canvas3D.ts</label>
-    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
       <code>
 // Importuje bibliotekę Three.js
 import * as THREE from "three";
@@ -199,7 +199,7 @@ export const canvas3D = new Canvas3D(".webgl");
     </pre>
 
 <label>index.css</label>
-<pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+<pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
 <code>
 *
 {
@@ -226,9 +226,8 @@ body
 
     <p>
       W przykładowej scenie dodawany jest również prosty obiekt geometryczny — płaszczyzna o białym kolorze
-      — który pełni rolę testową lub stanowi bazę do dalszej rozbudowy sceny. Jej rotacja w przestrzeni
-      pozwala na ustawienie jej w odpowiedniej orientacji względem kamery, co jest szczególnie istotne przy
-      prezentacji modeli trójwymiarowych.
+      Jej rotacja w przestrzeni pozwala na ustawienie jej w odpowiedniej orientacji względem kamery, 
+			co jest szczególnie istotne przy prezentacji modeli trójwymiarowych.
     </p>
 
     <p>
@@ -270,7 +269,7 @@ body
         </p>
 
         <label>Canvas3D.ts</label>
-        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
           <code>
 <span style="color: #ff0000;">import GUI from "lil-gui";</span>          
 </span>          
@@ -298,24 +297,24 @@ private setupGUI(): void {
           Three.js zastosowano ShaderMaterial z własnymi programami wierzchołkowymi i fragmentowymi. Dzięki temu możliwe
           jest pełne przejęcie kontroli nad procesem renderowania, co otwiera drogę do implementacji efektów specjalnych,
           takich jak niestandardowe oświetlenie, animacje proceduralne czy efekty post-processingu.
-
+				</p>
         <label>fragment.glsl</label>
-        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
           <code>
 void main()
 {
     // Kolor finalny
     gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
           </code>
         </pre>
 
         <label>vertex.glsl</label>
-        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
           <code>
 void main()
 {
@@ -328,7 +327,7 @@ void main()
           </code>
         </pre>
 
-        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+        <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
           <code>
 // Importuje shader wierzchołkowy
 import vertexShader from "../shaders/vertex.glsl";
@@ -375,14 +374,6 @@ const material = new THREE.ShaderMaterial({
       zachowaniem tonemappingu i przestrzeni kolorów, co pozwala uzyskać efekt spójny z domyślnymi ustawieniami silnika
       Three.js.
     </p>
-    
-		<p>
-			W procesie tworzenia aplikacji 3D często pojawia się potrzeba wzbogacenia statycznych scen o interaktywne,
-			dynamiczne komponenty. Three.js umożliwia to między innymi poprzez wykorzystanie materiałów opartych na shaderach
-			GLSL, które w połączeniu z biblioteką lil-gui pozwalają użytkownikowi wpływać na parametry renderowania w czasie
-			rzeczywistym. W niniejszym artykule porównujemy dwie wersje systemu renderującego: podstawową, w której shader
-			fragmentów tworzy prosty gradient, oraz rozszerzoną, gdzie wprowadzono dynamiczne uniformy.
-		</p>
 
 		<p>
 			Pierwsza wersja aplikacji wykorzystuje statyczny shader, w którym kolor każdego piksela ustalany jest na podstawie
@@ -392,7 +383,7 @@ const material = new THREE.ShaderMaterial({
 		</p>
 
     <label>fragment.glsl</label>
-    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+    <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
       <code>
 varying vec2 vUv;
 
@@ -405,9 +396,9 @@ void main()
     vec4 color = vec4(vec3(x), 1.0);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
       </code>
     </pre>
@@ -434,7 +425,7 @@ void main()
   </p>
 
   <label>vertex.glsl</label>
-  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
   <code>
     varying vec3 vPosition;
 
@@ -451,7 +442,7 @@ void main()
   </code></pre>
 
   <label>fragment.glsl</label>
-  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow-x: auto;">
+  <pre style="background-color: #1d1f2a; padding: 10px; border-radius: 5px; color: #ffffff; overflow: auto;">
     <code>
 uniform float uFrequency;
 varying vec2 vUv;
@@ -466,9 +457,9 @@ void main()
     vec4 color = vec4(vec3(strength), 1.0);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
               </code>
             </pre>
@@ -503,6 +494,14 @@ void main()
     <code>R2-D2.glb</code>, ale ten proces może dotyczyć dowolnego obiektu 3D w tym formacie.
   </p>
 
+	<p>
+		<a href="https://www.cgtrader.com/free-3d-models/character/sci-fi-character/r2-d2-8fd6505d-d14b-44c7-befb-caee9ec486cf" target="_blank" rel="noopener noreferrer">Link do modelu</a>
+		Warto powiedzieć, że najlepiej jest używać modeli w formacie GLB, ponieważ jest to format wspierany przez wiele przeglądarek.
+		Jednakże nie zawsze można znaleźć model w tym formacie, dlatego warto pobrać program do konwersji modeli 3d.
+		Ja osobiscie używam <a href="https://www.blender.org/" target="_blank" rel="noopener noreferrer">Blender</a>. 
+		Wczytuję model w formacie GLB i konwertuję go na GLTF.
+	</p>
+
   <p>
     Po załadowaniu modelu, następnie przechodzimy do jego centrowania w przestrzeni 3D. Zastosowanie <code>Box3</code> z
     Three.js pozwala na obliczenie otaczającej objętości modelu, a następnie wycentrowanie go w przestrzeni, co jest
@@ -518,16 +517,10 @@ void main()
   </p>
 
   <p>
-    Następnie konfigurujemy kamerę i kontrolki, pozwalające na interakcję z modelem w czasie rzeczywistym.
-    <code>OrbitControls</code> umożliwia użytkownikowi obracanie, przybliżanie i oddalanie widoku obiektu, co jest
-    szczególnie istotne w przypadku wizualizacji skomplikowanych obiektów 3D.
-  </p>
-
-  <p>
     Poniżej przedstawiamy kod, który ładuje model, centrowań go w przestrzeni oraz dostosowuje kamerę do jego rozmiaru:
   </p>
 
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code class="language-typescript">
+  <pre style="background-color: #1d1f2a; overflow: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code class="language-typescript">
 // Importowanie biblioteki Three.js
 import * as THREE from "three";
 // Importowanie kontrolera kamery umożliwiającego obracanie sceny
@@ -709,7 +702,7 @@ export const canvas3D = new Canvas3D(".webgl");
     </p>
 
     <label>Canvas3D.ts</label>
-    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;">
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;">
     <code>
 // dodanie podstawowego materiału
 private material: THREE.MeshBasicMaterial; // Podstawowy materiał dla modelu
@@ -783,7 +776,7 @@ private loadModel(): void {
       Dotychczas używany <code>MeshBasicMaterial</code> został zastąpiony niestandardowym materiałem <code>ShaderMaterial</code>, który wykorzystuje dwa pliki shaderów: <code>vertex.glsl</code> oraz <code>fragment.glsl</code>. Dzięki temu zyskujemy pełną kontrolę nad renderowaniem piksela i wierzchołka, co jest podstawą do implementacji efektu holograficznego.
     </p>
 
-      <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+      <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 this.material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
@@ -798,7 +791,7 @@ this.material = new THREE.ShaderMaterial({
     </p>
 
     <h2>2. Dodanie vertex shader</h2>
-    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 varying vec3 vPosition;
 
 void main() {
@@ -813,7 +806,7 @@ void main() {
     </p>
 
     <h2>3. Dodanie fragment shader</h2>
-    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 uniform float uFrequency;
 varying vec3 vPosition;
 
@@ -848,7 +841,7 @@ void main() {
       że nie została dodana zmienna <code>uFrequency</code> do <code>ShaderMaterial</code>.
     </p>
 
-    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+    <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 this.gui.add(this.rendererParameters, "frequency").onChange(() => {
     this.rendererParameters.frequency = this.rendererParameters.frequency;
     if (this.material) {
@@ -872,7 +865,7 @@ this.gui.add(this.rendererParameters, "frequency").onChange(() => {
     <code>uTime</code>.</p>
 
   <label>Canvas3D.ts</label>
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 //Dodanie zmiennej clock
 private clock: THREE.Clock;
 //...
@@ -904,7 +897,7 @@ tick();
     </code></pre>
 
   <label>fragment.glsl</label>
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 uniform float uFrequency;
 uniform float uTime;
 varying vec3 vPosition;
@@ -920,53 +913,50 @@ void main()
     vec4 color = vec4(vec3(stripes), 1.0);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
     </code></pre>
-  <p>Zmodyfikowano GUI do kontrolowania <code>frequency</code>, dodając zakres od 1 do 50 oraz krok 1. Pozwala to
-    użytkownikowi wygodnie manipulować gęstością efektu pasków w shaderze.</p>
+  <p>
+		Zmodyfikowano GUI do kontrolowania <code>frequency</code>, dodając zakres od 1 do 50 oraz krok 1. Pozwala to
+    użytkownikowi wygodnie manipulować gęstością efektu pasków w shaderze.
+	</p>
 
-  <p>W <code>fragmentShader</code> zaktualizowano obliczenia, dodając zależność od czasu: <code>(y - uTime * 0.1)</code>.
-    Dzięki temu paski przemieszczają się w górę lub w dół modelu, tworząc dynamiczny efekt skanowania.</p>
+  <p>
+		W <code>fragmentShader</code> zaktualizowano obliczenia, dodając zależność od czasu: <code>(y - uTime * 0.1)</code>.
+    Dzięki temu paski przemieszczają się w górę modelu.
+	</p>
 
-  <p>Dodano funkcję <code>pow(stripes, 3.0)</code>, która zaostrza gradient pasków, sprawiając, że są bardziej kontrastowe
-    i lepiej widoczne, co potęguje wrażenie "holograficznego skanu".</p>
-
-
+  <p>
+		Dodano funkcję <code>pow(stripes, 3.0)</code>, która zaostrza gradient pasków, sprawiając, że są bardziej kontrastowe
+    i lepiej widoczne, co potęguje wrażenie "holograficznego skanu".
+	</p>
     `,
 	},
 	{
 		id: "8",
 		title: "Tworzenie przezroczystosci",
 		content: `
-
-    <p>W <code>ShaderMaterial</code> dodano właściwość <code>transparent: true</code>, co pozwala obsługiwać przezroczystość
-    materiału i tym samym wykorzystać kanał alfa w fragmencie koloru.</p>
-  <p>W <code>fragmentShader</code> zmieniono linię <code>vec4 color = vec4(vec3(stripes), 1.0);</code> na
-    <code>vec4 color = vec4(vec3(1.0), stripes);</code>. Oznacza to, że teraz efekt pasków wpływa na przezroczystość
-    (kanał alfa), a nie jasność koloru. Dzięki temu powstaje efekt "przemiatania" skanera, gdzie tylko niektóre części
-    modelu są widoczne, zależnie od aktualnego paska.</p>
-  <p>Poprzez wykorzystanie kanału alfa shader tworzy dynamiczny efekt pojawiania się i znikania fragmentów modelu, dając
-    bardziej holograficzne, efemeryczne wrażenie.</p>
-
-
-      <p>Dodano nową zmienną <code>vNormal</code> jako <code>varying</code>, która przenosi wektor normalnej z vertex shadera
-  do fragment shadera. To umożliwia obliczenia zależne od kąta względem kamery.</p>
-<p>Wprowadzono obliczenie efektu *Fresnela* — iloczyn skalarny znormalizowanej różnicy pozycji kamery i fragmentu z
-  normalą powierzchni: <code>float fresnel = dot(normalize(viewDirection), vNormal);</code>. Efekt ten daje bardziej
-  realistyczne krawędziowe podświetlenie powierzchni zależne od kąta widzenia.</p>
-<p>Zmieniono wartość kanału alfa w kolorze końcowym z <code>stripes</code> na <code>fresnel</code>:
-  <code>vec4 color = vec4(vec3(1.0), fresnel);</code>. Teraz przezroczystość modelu zależy od kąta patrzenia względem
-  normalnej powierzchni, co daje efekt pojawiania się geometrii głównie na obrzeżach — typowy dla efektu Fresnela.</p>
-<p>Usunięto zastosowanie wartości <code>stripes</code> z wcześniejszego shadera — nie wpływa ona już na kolor ani
-  przezroczystość, choć jest nadal liczona. Można ją usunąć, jeśli nie będzie dalej używana lub łączyć z fresnelem dla
-  bardziej złożonego efektu.</p>
-
-  <h3>Cały kod do tej pory:</h3>
-  <label>Canvas3D.ts</label>
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+    <p>
+			W <code>ShaderMaterial</code> trzeba było dodać właściwość <code>transparent: true</code>, co pozwala obsługiwać przezroczystość
+			materiału i tym samym wykorzystać kanał alfa w fragmencie koloru. Bez tego kanał alfa (przezroczystość) nie działa.
+		</p>
+		<p>
+			W <code>fragmentShader</code> zmieniono linię <code>vec4 color = vec4(vec3(stripes), 1.0);</code> na
+			<code>vec4 color = vec4(vec3(1.0), stripes);</code>. Oznacza to, że teraz efekt pasków wpływa na przezroczystość
+			(kanał alfa), a nie jasność koloru. 
+			Poprzez wykorzystanie kanału alfa shader tworzy dynamiczny efekt pojawiania się i znikania fragmentów modelu, dając
+			bardziej holograficzne, efemeryczne wrażenie.
+		</p>
+    
+		<p>
+			Dodano nową zmienną <code>vNormal</code> jako <code>varying</code>, która przenosi wektor normalnej z vertex shadera
+			do fragment shadera. To umożliwia obliczenia zależne od kąta względem kamery.
+		</p>
+		<h3>Cały kod do tej pory:</h3>
+		<label>Canvas3D.ts</label>
+		<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import GUI from "lil-gui";
@@ -1147,10 +1137,11 @@ class Canvas3D {
 }
 
 export const canvas3D = new Canvas3D(".webgl");
-  </code></pre>
+  		</code>
+		</pre>
 
   <label>fragment.glsl</label>
-  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
 uniform float uFrequency;
 uniform float uTime;
 varying vec3 vPosition;
@@ -1166,28 +1157,68 @@ void main()
     vec4 color = vec4(vec3(1.0), stripes);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
-  </code></pre>
+  		</code>
+		</pre>
 
+  <label>vertex.glsl</label>
+  <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px; overflow: auto;"><code>
+uniform float uFrequency;
+uniform float uTime;
+varying vec3 vPosition;
+
+void main()
+{
+varying vec3 vPosition;
+
+
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+    // Varyings
+    vPosition = modelPosition.xyz;
+}
+  		</code>
+		</pre>
     `,
 	},
 	{
 		id: "9",
 		title: "Coś o odbiciu fresnela, mała ilosc teorii i przykład",
 		content: `
-		<p><strong>Efekt Fresnela</strong> to zjawisko optyczne, które opisuje, jak światło odbija się od powierzchni w
-  zależności od kąta patrzenia. Zgodnie z tym efektem:</p>
-  
-<p><strong>Im bardziej się patrzy na powierzchnię pod kątem (czyli po krawędzi), tym bardziej ją widać.</strong> A im
-  się patrzy bardziej "na wprost", tym mniej widoczna się staje (częściej przeźroczysta lub mniej błyszcząca).</p>
-<p><strong>Wzór podstawowy:</strong></p>
+		<p>
+			<strong>Efekt Fresnela</strong> to zjawisko optyczne, które opisuje, jak światło odbija się od powierzchni w
+			zależności od kąta patrzenia. Zgodnie z tym efektem:
+		</p>
 
-<pre><code>vec3 viewDir = normalize(vPosition - cameraPosition);
-float fresnel = dot(viewDir, vNormal);</code></pre>
-<p><strong>Co tu się dzieje:</strong></p>
+		<p>
+			Wprowadzono obliczenie efektu <b>Fresnela</b> — iloczyn skalarny znormalizowanej różnicy pozycji kamery i fragmentu z
+			normalą powierzchni: <code>float fresnel = dot(normalize(viewDirection), vNormal);</code>. Efekt ten daje bardziej
+			realistyczne krawędziowe podświetlenie powierzchni zależne od kąta widzenia.</p>
+		<p>Zmieniono wartość kanału alfa w kolorze końcowym z <code>stripes</code> na <code>fresnel</code>:
+			<code>vec4 color = vec4(vec3(1.0), fresnel);</code>. Teraz przezroczystość modelu zależy od kąta patrzenia względem
+			normalnej powierzchni, co daje efekt pojawiania się geometrii głównie na obrzeżach — typowy dla efektu Fresnela.
+			<br/>
+			<a href="https://pl.wikipedia.org/wiki/Równania_Fresnela" target="_blank" rel="noopener noreferrer">Więcej o efekcie Fresnela</a>
+		</p>
+
+		<p>
+			<strong>Im bardziej się patrzy na powierzchnię pod kątem (czyli po krawędzi), tym bardziej ją widać.</strong> A im
+			się patrzy bardziej "na wprost", tym mniej widoczna się staje (częściej przeźroczysta lub mniej błyszcząca).
+			</p>
+		<p><strong>Wzór podstawowy:</strong></p>
+
+		<pre><code>vec3 viewDir = normalize(vPosition - cameraPosition);
+		float fresnel = dot(viewDir, vNormal);</code></pre>
+		<p><strong>Co tu się dzieje:</strong></p>
 
 <ul>
   <li><code>vPosition - cameraPosition</code> – kierunek z fragmentu (punktu na obiekcie) do kamery.</li>
@@ -1195,14 +1226,8 @@ float fresnel = dot(viewDir, vNormal);</code></pre>
   <li><code>dot(...)</code> – iloczyn skalarny, mówi, jak bardzo te dwa kierunki są zgodne (1 = patrzymy prosto, 0 =
     patrzymy pod kątem 90°, czyli "po krawędzi").</li>
 </ul>
-<p>W klasycznym Fresnelu interesuje nas odwrotność tego — bo to właśnie krawędzie mają być bardziej widoczne:</p>
-<pre><code>float fresnel = 1.0 - dot(viewDir, vNormal);</code></pre>
-<p>Wartość fresnela zawsze będzie w zakresie od 0 do 1.</p>
-<p>0 oznacza, że obiekt jest całkowicie przeźroczysty (lub matowy) i nie odbija światła.</p>
-<p>1 oznacza, że obiekt jest całkowicie błyszczący i odbija światło.</p>
-<p>Wartość 0.5 oznacza, że obiekt jest połowę przeźroczysty i połowę błyszczący.</p>
 
-<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+<pre style="background-color: #1d1f2a; overflow: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 uniform float uFrequency;
 uniform float uTime;
 varying vec3 vPosition;
@@ -1218,17 +1243,15 @@ void main()
     // Fresnel
     vec3 viewDirection = vPosition - cameraPosition;
     float fresnel = dot(normalize(viewDirection), vNormal);
-    // fresnel = pow(fresnel, 3.0);
 
     // Kolor finalny
     vec4 color = vec4(vec3(1.0), fresnel);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
-
 </code></pre>
     `,
 	},
@@ -1236,6 +1259,13 @@ void main()
 		id: "10",
 		title: "Naprawa 'intencjonalnego buga' związanego z odbiciem fresnela",
 		content: `
+		<p>W klasycznym Fresnelu interesuje nas odwrotność tego — bo to właśnie krawędzie mają być bardziej widoczne:</p>
+<pre><code>float fresnel = 1.0 - dot(viewDir, vNormal);</code></pre>
+<p>Wartość fresnela zawsze będzie w zakresie od 0 do 1.</p>
+<p>0 oznacza, że obiekt jest całkowicie przeźroczysty (lub matowy) i nie odbija światła.</p>
+<p>1 oznacza, że obiekt jest całkowicie błyszczący i odbija światło.</p>
+<p>Wartość 0.5 oznacza, że obiekt jest połowę przeźroczysty i połowę błyszczący.</p>
+
 <p>Dodano do wartości Fresnela przesunięcie o <code>+1.0</code>: <code>fresnel = dot(...) + 1.0;</code>. Dzięki temu
   wartość wyjściowa nie zaczyna się od zera (czyli od pełnej przezroczystości), tylko przesuwa cały zakres w górę, co
   sprawia, że efekt jest bardziej widoczny nawet przy mniejszym kącie.</p>
@@ -1251,7 +1281,7 @@ void main()
   usunięty, jeśli niepotrzebny.</p>
 
 <label>fragment.glsl</label>
-<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
+<pre style="background-color: #1d1f2a; overflow: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
 uniform float uFrequency;
 uniform float uTime;
 varying vec3 vPosition;
@@ -1273,9 +1303,9 @@ void main()
     vec4 color = vec4(vec3(1.0), fresnel);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
 </code></pre>
     `,
@@ -1284,7 +1314,7 @@ void main()
 		id: "11",
 		title: "Dodanie odbicia fresnela do animacji hologramu",
 		content: `
-     <p>W porównaniu do poprzedniej wersji, ten shader wprowadza ważną zmianę: **łączenie efektu Fresnela z dynamicznymi paskami, aby uzyskać bardziej złożony efekt „hologramu”. Poniżej opisuję, co zostało zmienione lub dodane:</p>
+     <p>Teraz dodamy wcześniej stworzony efekt animacji hologramu do efektu Fresnela. Poniżej opisuję, co zostało zmienione lub dodane:</p>
 <p><strong>1. Nowa linia: <code>float holo = stripes * fresnel;</code></strong></p> <p>Łączy dwa efekty: poziome pasy (stripes) i Fresnela (czyli krawędziowy błysk), tworząc podstawę efektu przezroczystości.</p>
 <p><strong>2. Nowa linia: <code>holo += fresnel * 1.25;</code></strong></p> <p>Dodaje do powyższego wyniku jeszcze wzmocniony efekt Fresnela – niezależny od pasków. Dzięki temu nawet jeśli pasy mają zerową wartość, krawędzie i tak są widoczne. Daje to mocniejszy efekt „żarzących się” konturów.</p>
 <p><strong>3. Ostateczny kolor: <code>vec4(vec3(1.0), holo);</code></strong></p> <p>Wcześniej przezroczystość była sterowana tylko przez sam <code>fresnel</code>, teraz to połączenie <code>stripes * fresnel + fresnel * 1.25</code>, więc:</p> 
@@ -1322,9 +1352,9 @@ void main()
     vec4 color = vec4(vec3(1.0), holo);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
 </code></pre>
 
@@ -1335,20 +1365,22 @@ void main()
 		id: "12",
 		title: "Opis o widocznosci elementów modelu wykonczanie podstawowej animacji hologramu",
 		content: `
-      <p>W najnowszej wersji fragment shadera wprowadzono istotną zmianę w sposobie obliczania efektu Fresnela, poprzez
-  uwzględnienie orientacji renderowanej powierzchni względem kamery.</p>
+      <p>
+				Teraz zmienimy sposób obliczania efektu Fresnela, poprzez
+				uwzględnienie orientacji renderowanej powierzchni względem kamery.
+			</p>
 
-<p>Dodano obsługę odwrotnych normalnych poprzez sprawdzenie, czy dana powierzchnia jest skierowana frontem do kamery, i
-  w razie potrzeby odwrócenie normalnej. Dzięki temu efekt zachowuje się poprawnie niezależnie od tego, z której strony
-  patrzymy na obiekt – co ma znaczenie przy modelach renderowanych dwustronnie lub z odwróconymi trójkątami.</p>
+			<p>
+				Dodano obsługę odwrotnych normalnych poprzez sprawdzenie, czy dana powierzchnia jest skierowana frontem do kamery, i
+				w razie potrzeby odwrócenie normalnej. Dzięki temu efekt zachowuje się poprawnie niezależnie od tego, z której strony
+				patrzymy na obiekt – co ma znaczenie przy modelach renderowanych dwustronnie lub z odwróconymi trójkątami.
+			</p>
 
-<p>Reszta działania pozostała taka sama: wyliczany jest efekt pasków na podstawie pozycji w pionie oraz przesuniętego w
-  czasie współczynnika <code>uTime</code>, a wartość Fresnela dalej jest przesuwana o <code>+1.0</code> i potęgowana, co
-  pozwala na lepsze uwypuklenie krawędzi modelu przy zachowaniu przezroczystego centrum.</p>
-
-<p>Końcowa wartość przezroczystości (<code>alpha</code>) nadal opiera się na połączeniu pasków i Fresnela, co daje
-  bardziej dynamiczny efekt hologramu, teraz jednak poprawnie działający również na „odwrocie” obiektu.</p>
-
+			<p>
+				Reszta działania pozostała taka sama: wyliczany jest efekt pasków na podstawie pozycji w pionie oraz przesuniętego w
+				czasie współczynnika <code>uTime</code>, a wartość Fresnela dalej jest przesuwana o <code>+1.0</code> i potęgowana, co
+				pozwala na lepsze uwypuklenie krawędzi modelu przy zachowaniu przezroczystego centrum.
+			</p>
 
 <label>fragment.glsl</label>
 <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
@@ -1379,9 +1411,9 @@ void main()
     vec4 color = vec4(vec3(1.0), holo);
     gl_FragColor = color;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
 </code></pre>
     `,
@@ -1390,16 +1422,23 @@ void main()
 		id: "13",
 		title: "Tworzenie animacji glitcha",
 		content: `
-      <p>W tej wersji fragment shadera dodano dodatkową funkcjonalność, która wprowadza bardziej zaawansowane kontrolowanie
-  efektu przezroczystości poprzez parametr <code>uFalloff</code>, który kontroluje, jak szybko efekt Fresnela zanika na
-  brzegach. Użycie <code>falloff = smoothstep(uFalloff, 0.0, fresnel)</code> sprawia, że efekt przejścia od
-  przezroczystości do pełnej widoczności staje się bardziej płynny i naturalny, dzięki funkcji <code>smoothstep</code>,
-  która wygładza przejście.</p>
+  	<p>
+			Teraz dodajemy funkcjonalność, która wprowadza bardziej zaawansowane kontrolowanie
+			efektu przezroczystości poprzez parametr <code>uFalloff</code>, który kontroluje, jak szybko efekt Fresnela zanika na
+			brzegach. Użycie <code>falloff = smoothstep(uFalloff, 0.0, fresnel)</code> sprawia, że efekt przejścia od
+			przezroczystości do pełnej widoczności staje się bardziej płynny i naturalny, dzięki funkcji <code>smoothstep</code>,
+			która wygładza przejście.
+		</p>
 
-<p>Fresnel i paski są nadal obliczane w sposób podobny do poprzednich wersji, ale w tej wersji wprowadzono również
-  modyfikację koloru obiektu. Efekt hologramu jest teraz bardziej zróżnicowany, ponieważ jego kolor jest interpolowany
-  między zadanym <code>uColor</code> a białym, w zależności od intensywności efektu Fresnela, co daje bardziej
-  zróżnicowaną wizualizację.</p>
+	<p>
+		Dodatkowo dodałem nowy parametr <code>uColor</code>, który pozwala na zmianę koloru efektu hologramu.
+		Ale to jedynie kosmetyczna zmiana.
+	</p>
+
+	<p>Fresnel i paski są nadal obliczane w sposób podobny do poprzednich wersji, ale w tej wersji wprowadzono również
+		modyfikację koloru obiektu. Efekt hologramu jest teraz bardziej zróżnicowany, ponieważ jego kolor jest interpolowany
+		między zadanym <code>uColor</code> a białym, w zależności od intensywności efektu Fresnela, co daje bardziej
+		zróżnicowaną wizualizację.</p>
 
 <p>Na końcu wynikowy kolor jest uzyskiwany przez połączenie koloru obliczonego z Fresnelem oraz efektu
   <code>falloff</code>, który wygładza przejścia, co daje bardziej subtelną wizualizację hologramu. Całość jest
@@ -1443,106 +1482,17 @@ void main()
     vec4 finalColor = vec4(colorRGB, holo);
     gl_FragColor = finalColor;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
 
 </code></pre>
 
 <label>Canvas3D.ts</label>
 <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import GUI from "lil-gui";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import vertexShader from "../shaders/vertex.glsl";
-import fragmentShader from "../shaders/fragment.glsl";
+//...
 
-type RendererParameters = {
-	bgColor: string;
-	frequency: number;
-	falloff: number;
-	color: THREE.Color;
-};
-class Canvas3D {
-	private gui: GUI;
-	private canvas: HTMLCanvasElement;
-	private scene: THREE.Scene;
-	private gltfLoader: GLTFLoader;
-	private sizes: { width: number; height: number };
-	private camera: THREE.PerspectiveCamera;
-	private controls: OrbitControls;
-	private rendererParameters: RendererParameters;
-	private renderer: THREE.WebGLRenderer;
-	private material: THREE.ShaderMaterial | undefined;
-	private model: THREE.Group | null = null;
-	private clock: THREE.Clock;
-	constructor(canvasSelector: string) {
-		// Debug
-		this.gui = new GUI();
-
-		// Canvas
-		const canvasElement = document.querySelector(canvasSelector);
-		if (!canvasElement) {
-      throw new Error(
-        \`Canvas element with selector \${canvasSelector} not found\`
-      );
-		}
-		this.canvas = canvasElement as HTMLCanvasElement;
-
-		// Scene
-		this.scene = new THREE.Scene();
-
-		// Loaders
-		this.gltfLoader = new GLTFLoader();
-
-		// Sizes
-		this.sizes = {
-			width: window.innerWidth,
-			height: window.innerHeight,
-		};
-
-		// Camera
-		this.camera = new THREE.PerspectiveCamera(
-			10,
-			this.sizes.width / this.sizes.height,
-			0.1,
-			100
-		);
-		this.camera.position.set(5, 5, 5);
-		this.scene.add(this.camera);
-
-		// Controls
-		this.controls = new OrbitControls(this.camera, this.canvas);
-		this.controls.enableDamping = true;
-
-		// Renderer
-		this.rendererParameters = {
-			bgColor: "#1d1f2a",
-			frequency: 20,
-			falloff: 0.8,
-			color: new THREE.Color("#00ff00"),
-		};
-
-		this.renderer = new THREE.WebGLRenderer({
-			canvas: this.canvas,
-			antialias: true,
-		});
-		this.renderer.setClearColor(this.rendererParameters.bgColor);
-		this.renderer.setSize(this.sizes.width, this.sizes.height);
-		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-		// Clock
-		this.clock = new THREE.Clock();
-
-		// Setup
-		this.setupEventListeners();
-		this.setupGUI();
-		this.createMaterial();
-		this.loadModel();
-		this.animate();
-	}
 
 	private setupEventListeners(): void {
 		window.addEventListener("resize", () => {
@@ -1575,6 +1525,8 @@ class Canvas3D {
 						this.rendererParameters.frequency;
 				}
 			});
+		<span style="color: #f00;">
+		// Dodano nowy parametr Falloff
 		this.gui
 			.add(this.rendererParameters, "falloff")
 			.min(0)
@@ -1586,11 +1538,15 @@ class Canvas3D {
 						this.rendererParameters.falloff;
 				}
 			});
+		</span>
+			<span style="color: #0f0;">
+			// Dodano nowy parametr Color
 		this.gui.addColor(this.rendererParameters, "color").onChange(() => {
 			if (this.material) {
 				this.material.uniforms.uColor.value = this.rendererParameters.color;
 			}
 		});
+		</span>
 	}
 
 	private createMaterial(): void {
@@ -1605,61 +1561,21 @@ class Canvas3D {
 			uniforms: {
 				uFrequency: { value: this.rendererParameters.frequency },
 				uTime: { value: 0 },
+				<span style="color: #f00;"> 
+				// Dodano nowy parametr Falloff
 				uFalloff: { value: this.rendererParameters.falloff },
+				</span>
+				<span style="color: #0f0;">
+				// Dodano nowy parametr Color
 				uColor: { value: this.rendererParameters.color },
+				</span>
 			},
 		});
 	}
 
-	private loadModel(): void {
-		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
-			this.model = gltf.scene;
-			this.model.traverse((child) => {
-				if (child instanceof THREE.Mesh) child.material = this.material;
-			});
+	//...
 
-			// Centrowanie modelu
-			const box = new THREE.Box3().setFromObject(this.model);
-			const center = box.getCenter(new THREE.Vector3());
-			this.model.position.x -= center.x;
-			this.model.position.y -= center.y;
-			this.model.position.z -= center.z;
-
-			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
-			const size = box.getSize(new THREE.Vector3()).length();
-			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
-
-			this.camera.position.set(0, 0, distance);
-			this.camera.lookAt(0, 0, 0);
-			this.controls.update();
-
-			this.scene.add(this.model);
-		});
-	}
-
-	private animate(): void {
-		const tick = () => {
-			const elapsedTime = this.clock.getElapsedTime();
-
-			// Update material
-			if (this.material) {
-				this.material.uniforms.uTime.value = elapsedTime;
-			}
-			this.controls.update();
-			// Render
-			this.renderer.render(this.scene, this.camera);
-
-			// Call tick again on the next frame
-			window.requestAnimationFrame(tick);
-		};
-
-		tick();
-	}
-}
-
-export const canvas3D = new Canvas3D(".webgl");
-
-</code></pre>
+</pre>
 
     `,
 	},
@@ -1667,9 +1583,9 @@ export const canvas3D = new Canvas3D(".webgl");
 		id: "14",
 		title: "Dokończenie podstawowej animacji glitcha",
 		content: `
-      <p>W tej wersji dodano efekt <code>glitch</code>, który jest realizowany w vertex shaderze. Do pozycji wierzchołków
-  dodawane są losowe zakłócenia (przesunięcia) na podstawie funkcji <code>random2D</code>, która generuje losowe
-  wartości w płaszczyźnie <code>xz</code> oraz <code zx</code>, z uwzględnieniem czasu <code>uTime</code>. Dzięki temu
+      <p>Teraz dodamy efekt <b>glitch</b>, który jest realizowany w <code>vertex shaderze</code>. Do pozycji wierzchołków
+  dodawane są losowe zakłócenia (przesunięcia) na podstawie funkcji <code>random2D</code>, która generuje pseudolosowe
+  wartości w płaszczyźnie <code>xz</code> oraz <code>zx</code>, z uwzględnieniem czasu <code>uTime</code>. Dzięki temu
   geometria modelu zyskuje efekt „migotania” lub zakłóceń, które są dynamicznie zmienne w czasie.</p>
 
 <p>W shaderze fragmentu pozostał ten sam efekt hologramu, oparty na paskach i Fresnelu, z dodatkowymi parametrami dla
@@ -1683,52 +1599,9 @@ export const canvas3D = new Canvas3D(".webgl");
 
 <p>Warto zauważyć, że dzięki zastosowaniu <code>glitch</code> w vertex shaderze, geometria modelu zmienia się w sposób
   nieregularny, co nadaje jej bardziej chaotyczny, zakłócony wygląd. Efekt ten może być używany do uzyskania bardziej
-  dramatycznych, niestabilnych wizualizacji w połączeniu z holograficznym efektem. </p>
+  niestabilnych wizualizacji w połączeniu z holograficznym efektem. </p>
 
-<label>fragment.glsl</label>
-<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
-uniform float uFrequency;
-uniform float uTime;
-uniform vec3 uColor;
-uniform float uFalloff;
-
-varying vec3 vPosition;
-varying vec3 vNormal;
-
-void main()
-{
-    vec3 normal = normalize(vNormal);
-    if(!gl_FrontFacing){
-        normal *= - 1.0;
-    }
-    // wyciągnięcie wartości y z uv
-    float stripes = mod((vPosition.y- uTime * 0.1) * uFrequency, 1.0);
-    stripes = pow(stripes, 3.0);
-
-    // Fresnel
-    vec3 viewDirection = vPosition - cameraPosition;
-    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
-    fresnel = pow(fresnel, 3.0);
-
-    // Falloff
-    float falloff = smoothstep(uFalloff, 0.0, fresnel);
-
-    float holo = stripes * fresnel;
-    holo += fresnel * 1.25;
-    holo *= falloff;
-    
-    // Kolor finalny
-    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
-    vec4 finalColor = vec4(colorRGB, holo);
-    gl_FragColor = finalColor;
-    // Tonemapping z Three.js
-    #include <tonemapping_fragment>
-    // Colorspace z Three.js
-    #include <colorspace_fragment>
-}
-</code></pre>
-
-<p>Trzeba też dodać nową funkcję np. w folderze <code>utils</code> w pliku <code>random2d.glsl</code>.</p>
+<p style="font-style: italic;">Trzeba też dodać nową funkcję np. w folderze <code>utils</code> w pliku <code>random2d.glsl</code>.</p>
 
 <label>random2d.glsl</label>
 <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
@@ -1770,250 +1643,20 @@ void main()
     vNormal = modelNormal.xyz;
 }
 </code></pre>
-
-<label>Canvas3D.ts</label>
-<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import GUI from "lil-gui";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import vertexShader from "../shaders/vertex.glsl";
-import fragmentShader from "../shaders/fragment.glsl";
-
-type RendererParameters = {
-	bgColor: string;
-	frequency: number;
-	falloff: number;
-	color: THREE.Color;
-};
-class Canvas3D {
-	private gui: GUI;
-	private canvas: HTMLCanvasElement;
-	private scene: THREE.Scene;
-	private gltfLoader: GLTFLoader;
-	private sizes: { width: number; height: number };
-	private camera: THREE.PerspectiveCamera;
-	private controls: OrbitControls;
-	private rendererParameters: RendererParameters;
-	private renderer: THREE.WebGLRenderer;
-	private material: THREE.ShaderMaterial | undefined;
-	private model: THREE.Group | null = null;
-	private clock: THREE.Clock;
-	constructor(canvasSelector: string) {
-		// Debug
-		this.gui = new GUI();
-
-		// Canvas
-		const canvasElement = document.querySelector(canvasSelector);
-		if (!canvasElement) {
-			throw new Error(
-				\`Canvas element with selector \${canvasSelector} not found\`
-			);
-		}
-		this.canvas = canvasElement as HTMLCanvasElement;
-
-		// Scene
-		this.scene = new THREE.Scene();
-
-		// Loaders
-		this.gltfLoader = new GLTFLoader();
-
-		// Sizes
-		this.sizes = {
-			width: window.innerWidth,
-			height: window.innerHeight,
-		};
-
-		// Camera
-		this.camera = new THREE.PerspectiveCamera(
-			10,
-			this.sizes.width / this.sizes.height,
-			0.1,
-			100
-		);
-		this.camera.position.set(5, 5, 5);
-		this.scene.add(this.camera);
-
-		// Controls
-		this.controls = new OrbitControls(this.camera, this.canvas);
-		this.controls.enableDamping = true;
-
-		// Renderer
-		this.rendererParameters = {
-			bgColor: "#1d1f2a",
-			frequency: 20,
-			falloff: 0.8,
-			color: new THREE.Color("#00ff00"),
-		};
-
-		this.renderer = new THREE.WebGLRenderer({
-			canvas: this.canvas,
-			antialias: true,
-		});
-		this.renderer.setClearColor(this.rendererParameters.bgColor);
-		this.renderer.setSize(this.sizes.width, this.sizes.height);
-		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-		// Clock
-		this.clock = new THREE.Clock();
-
-		// Setup
-		this.setupEventListeners();
-		this.setupGUI();
-		this.createMaterial();
-		this.loadModel();
-		this.animate();
-	}
-
-	private setupEventListeners(): void {
-		window.addEventListener("resize", () => {
-			// Update sizes
-			this.sizes.width = window.innerWidth;
-			this.sizes.height = window.innerHeight;
-
-			// Update camera
-			this.camera.aspect = this.sizes.width / this.sizes.height;
-			this.camera.updateProjectionMatrix();
-
-			// Update renderer
-			this.renderer.setSize(this.sizes.width, this.sizes.height);
-			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		});
-	}
-
-	private setupGUI(): void {
-		this.gui.addColor(this.rendererParameters, "bgColor").onChange(() => {
-			this.renderer.setClearColor(this.rendererParameters.bgColor);
-		});
-		this.gui
-			.add(this.rendererParameters, "frequency")
-			.min(1)
-			.max(50)
-			.step(1)
-			.onChange(() => {
-				if (this.material) {
-					this.material.uniforms.uFrequency.value =
-						this.rendererParameters.frequency;
-				}
-			});
-		this.gui
-			.add(this.rendererParameters, "falloff")
-			.min(0)
-			.max(1)
-			.step(0.1)
-			.onChange(() => {
-				if (this.material) {
-					this.material.uniforms.uFalloff.value =
-						this.rendererParameters.falloff;
-				}
-			});
-		this.gui.addColor(this.rendererParameters, "color").onChange(() => {
-			if (this.material) {
-				this.material.uniforms.uColor.value = this.rendererParameters.color;
-			}
-		});
-	}
-
-	private createMaterial(): void {
-		this.material = new THREE.ShaderMaterial({
-			vertexShader: vertexShader,
-			fragmentShader: fragmentShader,
-			transparent: true,
-			blending: THREE.AdditiveBlending,
-			// depthTest: false,
-			depthWrite: false,
-			side: 2,
-			uniforms: {
-				uFrequency: { value: this.rendererParameters.frequency },
-				uTime: { value: 0 },
-				uFalloff: { value: this.rendererParameters.falloff },
-				uColor: { value: this.rendererParameters.color },
-			},
-		});
-	}
-
-	private loadModel(): void {
-		this.gltfLoader.load("/R2-D2.glb", (gltf) => {
-			this.model = gltf.scene;
-			this.model.traverse((child) => {
-				if (child instanceof THREE.Mesh) child.material = this.material;
-			});
-
-			// Centrowanie modelu
-			const box = new THREE.Box3().setFromObject(this.model);
-			const center = box.getCenter(new THREE.Vector3());
-			this.model.position.x -= center.x;
-			this.model.position.y -= center.y;
-			this.model.position.z -= center.z;
-
-			// Opcjonalnie: dostosuj kamerę do rozmiaru modelu
-			const size = box.getSize(new THREE.Vector3()).length();
-			const distance = size / Math.tan((Math.PI * this.camera.fov) / 180);
-
-			this.camera.position.set(0, 0, distance);
-			this.camera.lookAt(0, 0, 0);
-			this.controls.update();
-
-			this.scene.add(this.model);
-		});
-	}
-
-	private animate(): void {
-		const tick = () => {
-			const elapsedTime = this.clock.getElapsedTime();
-
-			// Update material
-			if (this.material) {
-				this.material.uniforms.uTime.value = elapsedTime;
-			}
-			this.controls.update();
-			// Render
-			this.renderer.render(this.scene, this.camera);
-
-			// Call tick again on the next frame
-			window.requestAnimationFrame(tick);
-		};
-
-		tick();
-	}
-}
-
-export const canvas3D = new Canvas3D(".webgl");
-
-</code></pre>
-
     `,
 	},
 	{
 		id: "15",
 		title: "Wykończanie animacji i efekt on hover",
 		content: `
-      <p>W tej wersji kodu shaderów zastosowano dwa główne efekty: glitch w vertex shaderze oraz bardziej zaawansowane efekty wizualne (Fresnel, paski, i falloff) w fragmencie shaderze.</p>
-<h3>Vertex Shader:</h3>
-<ul>
-  <li>Wprowadzono efekt glitcha, który polega na dodaniu losowych zakłóceń do pozycji wierzchołków w czasie.</li>
-  <li>Glitch generuje losowe "ziarna" na podstawie zmiennej <code>uTime</code>, co powoduje, że zakłócenia zmieniają się co 2 sekundy.</li>
-  <li>Ziarna są interpolowane, co pozwala na płynne przejścia między nimi.</li>
-  <li>Wartości te wpływają na to, jak poruszają się wierzchołki modelu, nadając mu wrażenie niestabilności lub migotania, zmieniającego się w czasie.</li>
-  <li>Ruch glitcha jest kontrolowany przez prędkość określoną przez <code>glitchSpeed</code>, a jego intensywność jest największa w okolicach centrum zakłócenia (które jest losowe i zmienia się w czasie).</li>
-  <li>Zakłócenia mają również płynne wygaszanie, które następuje przy przejściu między poszczególnymi ziarniami, co sprawia, że efekt staje się bardziej naturalny.</li>
-</ul>
-
-<h3>Fragment Shader:</h3>
-<ul>
-  <li>Paski są nadal generowane, ale ich częstotliwość (kontrolowana przez <code>uFrequency</code>) jest modyfikowana w zależności od czasu 
-	<code>uTime</code>, co powoduje dynamiczną zmianę wyglądu pasków.</li>
-  <li>Zastosowano efekt Fresnela, który jest obliczany z kierunku widzenia względem powierzchni. 
-	Dzięki temu efekt staje się bardziej widoczny na krawędziach obiektów, szczególnie przy dużych kątach widzenia. Fresnel jest podniesiony do potęgi 2.0, co sprawia, że przejścia są mniej dramatyczne, ale bardziej płynne w porównaniu do poprzednich wersji.</li>
-  <li>Dodano parametr <code>falloff</code>, który modyfikuje intensywność efektu Fresnela na podstawie odległości. 
-	Im bliżej krawędzi, tym efekt jest silniejszy. Wartość falloff jest obliczana za pomocą funkcji <code>smoothstep</code>, co zapewnia płynne przejście.</li>
-  <li>Kolor finalny jest uzyskiwany przez interpolację między kolorem podanym w <code>uColor</code> a białym, 
-	w zależności od intensywności hologramu, która jest uzależniona od efektu Fresnela oraz pasków.</li>
-</ul>
-
-<p>W efekcie całość tworzy dynamiczny, glitchowy wygląd z subtelnym efektem hologramu, który zmienia się w czasie.
- Zakłócenia w pozycjonowaniu wierzchołków oraz zmienne, wyraźniejsze przejścia na krawędziach obiektów tworzą interesujący, nieco niestabilny efekt wizualny.</p>
-
+      <p>Teraz warto naprawić animację glitcha. Przede wszystkim zmienimy sposób generowania losowych zakłóceń.</p>
+			<h3>Vertex Shader:</h3>
+			<ul>
+				<li>Glitch generuje losowe "ziarna" na podstawie zmiennej <code>uTime</code>, co powoduje, że zakłócenia zmieniają się co 2 sekundy.</li>
+				<li>Wartości te wpływają na to, jak poruszają się wierzchołki modelu, nadając mu wrażenie niestabilności lub migotania, zmieniającego się w czasie.</li>
+				<li>Ruch glitcha jest kontrolowany przez prędkość określoną przez <code>glitchSpeed</code>, a jego intensywność jest największa w okolicach centrum zakłócenia (które jest losowe i zmienia się w czasie).</li>
+				<li>Zakłócenia mają również płynne wygaszanie, które następuje przy przejściu między poszczególnymi ziarniami, co sprawia, że efekt staje się bardziej naturalny.</li>
+			</ul>
 
 <label>vertex.glsl</label>
 <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
@@ -2082,87 +1725,25 @@ void main()
     vNormal = modelNormal.xyz;
 }
 </code></pre>
-
-<label>fragment.glsl</label>
-<pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
-uniform float uFrequency;
-uniform float uTime;
-uniform vec3 uColor;
-uniform float uFalloff;
-
-varying vec3 vPosition;
-varying vec3 vNormal;
-
-void main()
-{
-    vec3 normal = normalize(vNormal);
-    if(!gl_FrontFacing){
-        normal *= - 1.0;
-    }
-    // wyciągnięcie wartości y z uv
-    float stripes = mod((vPosition.y- uTime * 0.2) * uFrequency, 1.0);
-    stripes = pow(stripes, 3.0);
-
-    // Fresnel
-    vec3 viewDirection = vPosition - cameraPosition;
-    float fresnel = dot(normalize(viewDirection), normal) + 1.0;
-    fresnel = pow(fresnel, 2.0);
-
-    // Falloff
-    float falloff = smoothstep(uFalloff, 0.0, fresnel);
-
-    float holo = stripes * fresnel;
-    holo += fresnel * 0.75;
-    holo *= falloff;
-    
-    // Kolor finalny
-    vec3 colorRGB = mix(uColor, vec3(1.0), holo);
-    vec4 finalColor = vec4(colorRGB, holo);
-    gl_FragColor = finalColor;
-    // Tonemapping z Three.js
-    #include <tonemapping_fragment>
-    // Colorspace z Three.js
-    #include <colorspace_fragment>
-}
-</code></pre>
     `,
 	},
 	{
 		id: "16",
 		title: "Dodanie kontrolki do zmiany koloru tła",
 		content: `
-<p>W tej wersji kodu shaderów zastosowano dwa główne efekty: glitch w vertex shaderze oraz bardziej zaawansowane efekty wizualne (Fresnel, paski, i falloff) w fragmencie shaderze. Dodatkowo, zastosowano interakcję z użytkownikiem, która pozwala na dynamiczną zmianę parametrów shaderów w odpowiedzi na interakcję z kursorem.</p>
+<p>
+		Jako osstatni krok, spróbujmy ulepszyć efekt glitcha. Tak naprawdę bardzo dużo zmian było robione metodą prób i błędów.
+		Po dłuższym czasie udało mi się ustalić odpowiednie wartości i sposób działania efektu.
+		Poniżej przedstawię cały kod w wersji finalnej i tam opiszę co zostało zmienione. 
+</p>
 
-<h3>Vertex Shader:</h3>
-<ul>
-  <li>Wprowadzono efekt glitcha, który polega na dodaniu losowych zakłóceń do pozycji wierzchołków w czasie.</li>
-  <li>Glitch generuje losowe "ziarna" na podstawie zmiennej <code>uTime</code>, co powoduje, że zakłócenia zmieniają się co 2 sekundy.</li>
-  <li>Ziarna są interpolowane, co pozwala na płynne przejścia między nimi.</li>
-  <li>Wartości te wpływają na to, jak poruszają się wierzchołki modelu, nadając mu wrażenie niestabilności lub migotania, zmieniającego się w czasie.</li>
-  <li>Ruch glitcha jest kontrolowany przez prędkość określoną przez <code>glitchSpeed</code>, a jego intensywność jest największa w okolicach centrum zakłócenia (które jest losowe i zmienia się w czasie).</li>
-  <li>Zakłócenia mają również płynne wygaszanie, które następuje przy przejściu między poszczególnymi ziarniami, co sprawia, że efekt staje się bardziej naturalny.</li>
-  <li>Wartość intensywności glitcha jest kontrolowana przez <code>glitchStrength</code>, który zmienia się w zależności od odległości od centrum zakłócenia.</li>
-  <li>Na każdą zmianę ziarna glitcha wprowadzona jest płynna zmiana jego intensywności, co wprowadza subtelność w przejściu między różnymi stanami glitcha.</li>
-</ul>
-
-<h3>Fragment Shader:</h3>
-<ul>
-  <li>Paski są nadal generowane, ale ich częstotliwość (kontrolowana przez <code>uFrequency</code>) jest modyfikowana w zależności od czasu <code>uTime</code>, co powoduje dynamiczną zmianę wyglądu pasków.</li>
-  <li>Zastosowano efekt Fresnela, który jest obliczany z kierunku widzenia względem powierzchni. Dzięki temu efekt staje się bardziej widoczny na krawędziach obiektów, szczególnie przy dużych kątach widzenia. Fresnel jest podniesiony do potęgi 2.0, co sprawia, że przejścia są mniej dramatyczne, ale bardziej płynne w porównaniu do poprzednich wersji.</li>
-  <li>Dodano parametr <code>falloff</code>, który modyfikuje intensywność efektu Fresnela na podstawie odległości. Im bliżej krawędzi, tym efekt jest silniejszy. Wartość falloff jest obliczana za pomocą funkcji <code>smoothstep</code>, co zapewnia płynne przejście.</li>
-  <li>Kolor finalny jest uzyskiwany przez interpolację między kolorem podanym w <code>uColor</code> a białym, w zależności od intensywności hologramu, która jest uzależniona od efektu Fresnela oraz pasków.</li>
-  <li>Efekt hologramu jest dynamicznie modyfikowany przez częstotliwość pasków, co powoduje, że obiekt zmienia swój wygląd w czasie.</li>
-</ul>
-
-<h3>Interakcja z użytkownikiem i dynamiczna zmiana parametrów:</h3>
-<ul>
-  <li>Za pomocą JavaScript dodano możliwość interakcji z użytkownikiem. Zmiana parametrów shaderów odbywa się w odpowiedzi na najechanie kursorem na obiekt w scenie.</li>
-  <li>Podczas najechania kursora na obiekt, zmienia się częstotliwość pasków (parametr <code>uFrequency</code>) oraz kolor obiektu (parametr <code>uColor</code>). W ten sposób użytkownik może zmieniać wygląd obiektów na scenie w czasie rzeczywistym.</li>
-  <li>Zmiana parametrów odbywa się płynnie, dzięki czemu przejścia między różnymi stanami shaderów są subtelne i naturalne.</li>
-  <li>Po zdjęciu kursora z obiektu, parametry wracają do wartości początkowych, przywracając pierwotny wygląd obiektu.</li>
-</ul>
-
-<p>W efekcie całość tworzy dynamiczny, glitchowy wygląd z subtelnym efektem hologramu, który zmienia się w czasie. Zakłócenia w pozycjonowaniu wierzchołków oraz zmienne, wyraźniejsze przejścia na krawędziach obiektów tworzą interesujący, nieco niestabilny efekt wizualny. Dzięki dynamicznej interakcji z użytkownikiem, efekt staje się bardziej interaktywny i responsywny na działania użytkownika.</p>
+	<p>
+		Dodatkowo, dodałem efekt glitcha przy najechaniu myszą.
+		Wartość <code>uHoverGlitch</code> kontroluje intensywność efektu glitcha przy najechaniu myszą.
+		Wychwytywanie najechania myszą jest de facto możliwe poprzez używanie raycastera, który jest dostępny w Three.js.
+		Raycaster sprawia, że wszystkie obiekty mają własne zdarzenia, które można łatwo wyłapać.
+		W tym przypadku, chcemy wyłapać najechanie myszą na obiekt, który ma skrypt Canvas3D.
+	</p>
 
 <label>vertex.glsl</label>
 <pre style="background-color: #1d1f2a; overflow-x: auto; color: #fff; padding: 10px; border-radius: 5px;"><code>
@@ -2290,9 +1871,9 @@ void main()
     vec4 finalColor = vec4(colorRGB, holo);
     gl_FragColor = finalColor;
     // Tonemapping z Three.js
-    #include <tonemapping_fragment>
+    #include &lt;tonemapping_fragment>
     // Colorspace z Three.js
-    #include <colorspace_fragment>
+    #include &lt;colorspace_fragment>
 }
 </code></pre>
 
@@ -2407,8 +1988,10 @@ class Canvas3D {
 			this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 		});
 
+		<span style="color: #0f0;">
 		// Raycaster dla detekcji najechania na mesh
 		const raycaster = new THREE.Raycaster();
+		// Vector2 dla pozycji myszy
 		const mouse = new THREE.Vector2();
 
 		// Dodajemy zmienną do śledzenia ostatniego stanu
@@ -2443,6 +2026,7 @@ class Canvas3D {
 				}
 			}
 		});
+		</span>
 	}
 
 	private setupGUI(): void {
@@ -2473,7 +2057,8 @@ class Canvas3D {
 				this.material.uniforms.uColor.value = this.rendererParameters.color;
 			}
 		});
-
+		<span style="color: #0f0;">
+		// Dodano nowy parametr HoverGlitchIntensity
 		this.gui
 			.add(this.rendererParameters, "hoverGlitchIntensity")
 			.min(0)
@@ -2485,6 +2070,7 @@ class Canvas3D {
 						this.rendererParameters.hoverGlitchIntensity;
 				}
 			});
+		</span>
 	}
 
 	private createMaterial(): void {
@@ -2501,7 +2087,10 @@ class Canvas3D {
 				uTime: { value: 0 },
 				uFalloff: { value: this.rendererParameters.falloff },
 				uColor: { value: this.rendererParameters.color },
+				<span style="color: #0f0;">
+				// Dodano nowy parametr HoverGlitchIntensity
 				uHoverGlitch: { value: 0.0 },
+				</span>
 			},
 		});
 	}

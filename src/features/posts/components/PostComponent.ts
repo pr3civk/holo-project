@@ -12,7 +12,6 @@ export class PostComponent extends HTMLElement {
 
 	set post(post: Post) {
 		if (!this.shadowRoot) return;
-		//TODO: wrzucić style  do CSS-a
 		this.shadowRoot.innerHTML = `
    <style>
         :host {
@@ -92,6 +91,7 @@ export class PostComponent extends HTMLElement {
         }
       </style>
           <article>
+          <h2 class="post-title">${post.title}</h2>
         <div class="post-content">${post.content}</div>
         <div class="iframe-container">
           <div class="loader" id="loader-${post.id}"></div>
@@ -104,8 +104,6 @@ export class PostComponent extends HTMLElement {
 			)}" target="_blank" rel="noopener noreferrer" style="width: 100%;">
           <button class="open-button">Otwórz w nowej karcie</button>
         </a>
-  
-
       </article>
     `;
 	}
