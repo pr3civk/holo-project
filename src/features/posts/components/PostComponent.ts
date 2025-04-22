@@ -1,3 +1,4 @@
+//Importuje typ Post z pliku Post.ts
 import { Post } from "../types/Post";
 
 //Funkcja zwracająca link do strony z postem
@@ -5,13 +6,19 @@ const getBaseUrl = (id: string) => `/features/3d-stages/${id}_stage/index.html`;
 
 //Klasa rozszerzająca HTMLElement i tworząca nowy element blog-post
 export class PostComponent extends HTMLElement {
+	//Konstruktor klasy PostComponent
 	constructor() {
+		//Wywołuje konstruktor klasy HTMLElement
 		super();
+		//Tworzy shadow root dla elementu
 		this.attachShadow({ mode: "open" });
 	}
 
+	//Metoda ustawiająca post do elementu
 	set post(post: Post) {
+		//Sprawdza czy shadow root istnieje
 		if (!this.shadowRoot) return;
+		//Ustawia HTML elementu
 		this.shadowRoot.innerHTML = `
    <style>
         :host {
@@ -110,12 +117,17 @@ export class PostComponent extends HTMLElement {
 
 	//Ukrywanie loader'a
 	hideLoader(postId: string) {
+		//Sprawdza czy shadow root istnieje
 		if (!this.shadowRoot) return;
+		//Pobiera loader'a
 		const loader = this.shadowRoot.getElementById(`loader-${postId}`);
+		//Sprawdza czy loader istnieje
 		if (loader) {
+			//Dodaje klasę hidden do loader'a
 			loader.classList.add("hidden");
 		}
 	}
 }
 
+//Definiuje element blog-post
 customElements.define("blog-post", PostComponent);

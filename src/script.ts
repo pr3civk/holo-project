@@ -4,6 +4,7 @@ import { posts } from "./features/posts";
 
 //Funkcja główna
 function main() {
+  //Pobranie elementu #app
 	const appElement = document.querySelector<HTMLDivElement>("#app");
 	//Sprawdzenie czy element #app istnieje
 	if (!appElement) {

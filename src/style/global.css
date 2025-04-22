@@ -1,50 +1,75 @@
 :root {
+  /* Definiuje główny font */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Ustawia wysokość linii na 1.5 */
   line-height: 1.5;
+  /* Ustawia wagę czcionki na 400 */
   font-weight: 400;
+  /* Ustawia schemat kolorów na light dark */
   color-scheme: light dark;
+  /* Ustawia kolor tekstu na #213547 */
   color: #213547;
+  /* Ustawia tło na #f0f0f0 */
   background-color: #f0f0f0;
 }
 
 body {
+  /* Ustawia marginesy na zero */
   margin: 0;
+  /* Ustawia minimalną szerokość na 320px */
   min-width: 320px;
+  /* Ustawia minimalną wysokość na 100% wysokości okna */
   min-height: 100vh;
 }
 
 #app {
+  /* Ustawia maksymalną szerokość na 800px */
   max-width: 800px;
+  /* Ustawia marginesy auto */
   margin: 0 auto;
+  /* Ustawia padding na 2rem */
   padding: 2rem;
 }
 
 .blog-header {
+  /* Ustawia wyrównanie tekstu na justify */
   text-align: justify;
+  /* Ustawia margines na dole na 2rem */
   margin-bottom: 2rem;
 }
 
 .blog-title {
+  /* Ustawia rozmiar czcionki na 2.5em */
   font-size: 2.5em;
+  /* Ustawia kolor tekstu na #c4c4c4 */
   color: #c4c4c4;
+  /* Ustawia margines na dole na 10px */
   margin-bottom: 10px;
 }
 
 .blog-description {
+  /* Ustawia kolor tekstu na #9e9e9e */
   color: #9e9e9e;
+  /* Ustawia rozmiar czcionki na 1.2em */
   font-size: 1.2em;
 }
 
 .code {
+  /* Ustawia tło na #1d1f2a */
   background-color: #1d1f2a;
+  /* Ustawia padding na 10px */
   padding: 10px;
+  /* Ustawia zaokrąglenie na 5px */
   border-radius: 5px;
+  /* Ustawia kolor tekstu na #ffffff */
   color: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Ustawia kolor tekstu na #ffffff */
     color: rgba(255, 255, 255, 0.87);
+    /* Ustawia tło na #242424 */
     background-color: #242424;
   }
 }

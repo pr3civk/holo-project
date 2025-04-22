@@ -1,19 +1,22 @@
+/* Resetowanie domyślnych stylów dla wszystkich elementów */
 *
 {
     margin: 0;
     padding: 0;
 }
 
+/* Zapobieganie przewijaniu na całej stronie */
 html,
 body
 {
     overflow: hidden;
 }
 
+/* Styl dla elementu canvas WebGL */
 .webgl
 {
-    position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
+    position: fixed; /* Pozycjonowanie stałe względem okna przeglądarki */
+    top: 0; /* Wyrównanie do górnej krawędzi */
+    left: 0; /* Wyrównanie do lewej krawędzi */
+    outline: none; /* Usunięcie obramowania podczas fokusowania */
 }
